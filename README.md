@@ -3,13 +3,5 @@
 A stack for cooperative target tracking
 
 Heirarchy of packages:
- 
- object detecttion  
-       |            |
-       |            |
-       V            |
-measurement fusion  |
-       |            |
-       |            |
-       V            V
-target tracking       
+
+object detecttion --> measurement fusion --> target tracking       
