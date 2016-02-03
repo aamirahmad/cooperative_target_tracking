@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<launch>
+
+  
+<!--   <include file="$(find openni2_launch)/launch/openni2.launch"/> -->
+  
+  <param name="IMAGE_TOPIC" value="/camera/rgb/image_raw" type="string" />
+
+  <node name="tgt_detector" pkg="tgt_detection" type="tgt_detector" output="screen" />
+
+
+</launch>
