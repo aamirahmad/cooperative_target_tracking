@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   width="744.09448"
+   height="1052.3622"
+   id="svg8534">
+  <defs
+     id="defs8536">
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="marker7857"
+       style="overflow:visible">
+      <path
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         id="path7859"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="marker8461"
+       style="overflow:visible">
+      <path
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         id="path8463"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="marker8465"
+       style="overflow:visible">
+      <path
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         id="path8467"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="Arrow1Mend-5"
+       style="overflow:visible">
+      <path
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         id="path3858-2"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="marker8471"
+       style="overflow:visible">
+      <path
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         id="path8473"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="marker8475"
+       style="overflow:visible">
+      <path
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         id="path8477"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="marker8479"
+       style="overflow:visible">
+      <path
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         id="path8481"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="Arrow1Mend"
+       style="overflow:visible">
+      <path
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         id="path3858"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="marker8485"
+       style="overflow:visible">
+      <path
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         id="path8487"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt" />
+    </marker>
+  </defs>
+  <metadata
+     id="metadata8539">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1">
+    <rect
+       width="379.40698"
+       height="205.8304"
+       x="142.16563"
+       y="254.4176"
+       id="rect2987"
+       style="fill:#007cf9;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.77698326;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1.55396652, 3.10793303;stroke-dashoffset:0" />
+    <text
+       x="117.28819"
+       y="250.67419"
+       id="text2989"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"><tspan
+         x="117.28819"
+         y="250.67419"
+         id="tspan2991">detector node</tspan></text>
+    <g
+       transform="translate(-3.1308821,-337.688)"
+       id="g8335">
+      <path
+         d="m 335,802.89147 0,50"
+         id="path4527"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Mend)" />
+      <g
+         transform="translate(-61.101562,198)"
+         id="g4515">
+        <rect
+           width="311.94141"
+           height="37.170914"
+           ry="0"
+           x="240.13086"
+           y="660.67126"
+           id="rect4475-5"
+           style="fill:#00f968;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.05589676;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+        <text
+           x="260"
+           y="682.36218"
+           id="text4511"
+           xml:space="preserve"
+           style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"><tspan
+             x="260"
+             y="682.36218"
+             id="tspan4513">ros::geometry_msgs/PoseWithCovarianceStamped</tspan></text>
+      </g>
+    </g>
+    <g
+       transform="translate(-4.2324421,-97.687997)"
+       id="g8328">
+      <g
+         transform="translate(0.23339081,0)"
+         id="g4520">
+        <rect
+           width="167.32195"
+           height="37.450584"
+           ry="0"
+           x="252.2072"
+           y="280.53143"
+           id="rect4475"
+           style="fill:#00f968;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.77622759;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+        <text
+           x="270"
+           y="302.36218"
+           id="text4477"
+           xml:space="preserve"
+           style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"><tspan
+             x="270"
+             y="302.36218"
+             id="tspan4479">ros::sensor_msgs/Image</tspan></text>
+      </g>
+      <path
+         d="m 336.10156,318.38669 0,33.30251"
+         id="path4525"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow1Mend)" />
+    </g>
+    <g
+       transform="translate(-16.711812,-189.688)"
+       id="g5501">
+      <rect
+         width="107.21442"
+         height="20.263031"
+         x="240.45616"
+         y="575.19843"
+         id="rect3801-0-4"
+         style="fill:#00f917;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.73696828;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+      <text
+         x="254.13759"
+         y="588.36218"
+         id="text2999-7-7"
+         xml:space="preserve"
+         style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"><tspan
+           x="254.13759"
+           y="588.36218"
+           id="tspan3001-6-3">obj_detector_n </tspan></text>
+    </g>
+    <g
+       transform="translate(-16.711802,-227.688)"
+       id="g5501-6">
+      <rect
+         width="107.21442"
+         height="20.263031"
+         x="240.45616"
+         y="575.19843"
+         id="rect3801-0-4-9"
+         style="fill:#00f917;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.73696828;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+      <text
+         x="254.13759"
+         y="588.36218"
+         id="text2999-7-7-3"
+         xml:space="preserve"
+         style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"><tspan
+           x="254.13759"
+           y="588.36218"
+           id="tspan3001-6-3-4">obj_detector_2 </tspan></text>
+    </g>
+    <path
+       d="m 277.35156,369.56314 0,14.43689"
+       id="path3843-1"
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1, 2;stroke-dashoffset:0;marker-end:none" />
+    <rect
+       width="61.600285"
+       height="23.039684"
+       x="385.08789"
+       y="352.99457"
+       id="rect5895"
+       style="fill:#00f917;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.62788248;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+    <path
+       d="m 333.28819,329.67418 50,25"
+       id="path5924"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Mend-5)" />
+    <path
+       d="m 333.2354,359.67418 50,0"
+       id="path5926"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Mend-5)" />
+    <path
+       d="m 333.27117,394.67418 50,-20"
+       id="path5928"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Mend-5)" />
+    <path
+       d="m 358.6104,365.36748 0,15"
+       id="path5930"
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1, 1;stroke-dashoffset:0" />
+    <text
+       x="348.65582"
+       y="329.89423"
+       id="text6126"
+       xml:space="preserve"
+       style="font-size:8px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"><tspan
+         x="348.65582"
+         y="329.89423"
+         id="tspan6128">pose estimate</tspan></text>
+    <text
+       x="393.13217"
+       y="366.63159"
+       id="text6130"
+       xml:space="preserve"
+       style="font-size:8px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"><tspan
+         x="393.13217"
+         y="366.63159"
+         id="tspan6132">pose fusion?</tspan></text>
+    <path
+       d="m 418.32311,379.63926 0,50.0461 -86.44117,0 0,25.02305"
+       id="path6134"
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow1Mend-5)" />
+    <text
+       x="363.28818"
+       y="444.67419"
+       id="text6330"
+       xml:space="preserve"
+       style="font-size:8px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"><tspan
+         x="363.28818"
+         y="444.67419"
+         id="tspan6332">PoseWithCovariance</tspan></text>
+    <g
+       transform="translate(-16.711802,-261.688)"
+       id="g5501-6-5">
+      <rect
+         width="107.21442"
+         height="20.263031"
+         x="240.45616"
+         y="575.19843"
+         id="rect3801-0-4-9-0"
+         style="fill:#00f917;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.73696828;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+      <text
+         x="254.13759"
+         y="588.36218"
+         id="text2999-7-7-3-1"
+         xml:space="preserve"
+         style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"><tspan
+           x="254.13759"
+           y="588.36218"
+           id="tspan3001-6-3-4-5">obj_detector_1 </tspan></text>
+    </g>
+    <text
+       x="173.28819"
+       y="304.67419"
+       id="text8037"
+       xml:space="preserve"
+       style="font-size:8px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"><tspan
+         x="173.28819"
+         y="304.67419"
+         id="tspan8039">image</tspan></text>
+    <path
+       d="m 183.28819,314.67418 0,80 40,0"
+       id="path8041"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#marker7857)" />
+    <path
+       d="m 183.28819,354.67418 40,0"
+       id="path8043"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#marker7857)" />
+    <path
+       d="m 183.28819,324.67418 40,0"
+       id="path8045"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#marker7857)" />
+  </g>
+</svg>
