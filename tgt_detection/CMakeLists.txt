@@ -16,7 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
-  visp_ros
+#   visp_ros
   cv_bridge
   sensor_msgs
   geometry_msgs

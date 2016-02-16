@@ -25,15 +25,15 @@
 
 #include <sys/time.h> 
 
-#include <visp3/gui/vpDisplayGDI.h>
-#include <visp3/gui/vpDisplayOpenCV.h>
-#include <visp3/gui/vpDisplayX.h>
-#include <visp3/io/vpImageIo.h>
-#include <visp3/core/vpIoTools.h>
-#include <visp3/mbt/vpMbEdgeTracker.h>
-#include <visp3/mbt/vpMbEdgeKltTracker.h>
-#include <visp3/io/vpVideoReader.h>
-#include <visp_ros/vpROSGrabber.h>
+// #include <visp3/gui/vpDisplayGDI.h>
+// #include <visp3/gui/vpDisplayOpenCV.h>
+// #include <visp3/gui/vpDisplayX.h>
+// #include <visp3/io/vpImageIo.h>
+// #include <visp3/core/vpIoTools.h>
+// #include <visp3/mbt/vpMbEdgeTracker.h>
+// #include <visp3/mbt/vpMbEdgeKltTracker.h>
+// #include <visp3/io/vpVideoReader.h>
+// #include <visp_ros/vpROSGrabber.h>
 
 //#define DRAW_DEBUG
 #undef DRAW_DEBUG
