@@ -115,7 +115,7 @@ void Detector::segmentationBasedDetection(const sensor_msgs::Image::ConstPtr& im
       
       Z_obj_camfrm = pow((camFx*camFy*objectRealSurfaceArea/objectSizeInImage),0.5);
       X_obj_camfrm = Z_obj_camfrm*(objectCenterIm.x-camCx)/camFx;
-      Y_obj_camfrm = Z_obj_camfrm*(-objectCenterIm.y+camCy)/camFy;
+      Y_obj_camfrm = Z_obj_camfrm*(objectCenterIm.y-camCy)/camFy;
       
   
       tfObCam.setOrigin( tf::Vector3(X_obj_camfrm, Y_obj_camfrm, Z_obj_camfrm));
