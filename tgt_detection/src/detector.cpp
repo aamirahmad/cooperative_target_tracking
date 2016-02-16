@@ -125,6 +125,26 @@ void Detector::segmentationBasedDetection(const sensor_msgs::Image::ConstPtr& im
       br.sendTransform(tf::StampedTransform(tfObCam, actualMessageTime, camRGBOpticalFrameLink, objectLink));
       br.sendTransform(tf::StampedTransform(tfCamRob, actualMessageTime, robotBaseLink, camBaseLink));      
       
+      //Now get the target in the world link frame
+      try
+      {
+	listenerObjWorld.lookupTransform("/world_link", objectLink, ros::Time(0), transformObjWorld);
+	poseObjWorld.pose.position.x = transformObjWorld.getOrigin().x();
+	poseObjWorld.pose.position.y = transformObjWorld.getOrigin().y();
+	poseObjWorld.pose.position.z = transformObjWorld.getOrigin().z();
+	
+	objWorldPub_.publish(poseObjWorld);	
+      }      
+      
+      catch (tf::TransformException &ex) 
+      {
+	ROS_WARN("%s",ex.what());
+	ros::Duration(1.0).sleep();
+	return;
+      }      
+
+      
+      
 //       std::cout<<"objectCenterIm.x in pixels = "<<objectCenterIm.x<<std::endl;
 //       std::cout<<"objectCenterIm.y in pixels = "<<objectCenterIm.y<<std::endl;
       

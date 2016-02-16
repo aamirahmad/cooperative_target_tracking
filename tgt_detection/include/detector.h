@@ -9,6 +9,7 @@
 #include "image_transport/image_transport.h"
 #include <cv_bridge/cv_bridge.h>
 #include <tf/transform_broadcaster.h>
+#include <tf/transform_listener.h>
 #include <std_msgs/String.h>
 #include <std_msgs/Float32.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -63,6 +64,7 @@ class Detector
     image_transport::ImageTransport it_;
     image_transport::Subscriber imageSub_;
     Subscriber camInfoSub_,robotPoseSub_;
+    Publisher objWorldPub_;
     
     
     int minAreaOfTargetProject;
@@ -78,6 +80,11 @@ class Detector
     //tf broadcaster and transforms
     tf::TransformBroadcaster br;
     tf::Transform tfObCam,tfCamRob,tfRobWorld;//Object in cam frame,Cam in robot frame, Robot in World frame
+    tf::TransformListener listenerObjWorld;
+    tf::StampedTransform transformObjWorld;
+    
+    //detected object pose in world frame
+    geometry_msgs::PoseStamped poseObjWorld;
   
   public:
     Detector(NodeHandle &_nh, char *detectorType): nh_(_nh), it_(nh_)
@@ -117,11 +124,15 @@ class Detector
       
        // Other subscribers
       robotPoseSub_ = nh_.subscribe<geometry_msgs::PoseStamped>(robotPoseTopic, 10,boost::bind(&Detector::storeLatestRobotPose,this,_1));      
+      
+      // Publishers
+      objWorldPub_ = nh_.advertise<geometry_msgs::PoseStamped>("/fixPoint", 1000);
        
        //Setting up fixed transformations if any
       tfCamRob.setOrigin( tf::Vector3(0.0975,0.0,-0.04603));
       tf::Quaternion q_1(0.0,0.38,0.0,0.924);
       tfCamRob.setRotation(q_1);
+      
 
     }
     
