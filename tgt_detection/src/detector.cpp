@@ -1,9 +1,26 @@
 #include "../include/detector.h" 
 
+
+void Detector::storeLatestRobotPose(const geometry_msgs::PoseStamped::ConstPtr& msg)
+{
+  ros::Time actualMessageTime(msg->header.stamp.sec, msg->header.stamp.nsec);
+
+  tfRobWorld.setOrigin(tf::Vector3(msg->pose.position.x,msg->pose.position.y,msg->pose.position.z));
+  tf::Quaternion q(msg->pose.orientation.x,msg->pose.orientation.y,msg->pose.orientation.z,msg->pose.orientation.w);
+  tfRobWorld.setRotation(q);
+  
+  br.sendTransform(tf::StampedTransform(tfRobWorld, actualMessageTime, "world_link", robotBaseLink));
+}
+
+
+
 void Detector::storeCameraInfo(const sensor_msgs::CameraInfo::ConstPtr& msg)
 {
   camFx = msg->K[0];
   camFy = msg->K[4];
+  
+  camCx = msg->K[2];
+  camCy = msg->K[5];
   
   ROS_INFO("cameraFx = %f",camFx);
   ROS_INFO("cameraFy = %f",camFy);
@@ -35,6 +52,7 @@ void Detector::featureBasedDetection(const sensor_msgs::Image::ConstPtr& image)
 void Detector::segmentationBasedDetection(const sensor_msgs::Image::ConstPtr& image)
 {
   //ROS_INFO("Received a mask Image");
+  ros::Time actualMessageTime(image->header.stamp.sec, image->header.stamp.nsec);
 
   cv_bridge::CvImagePtr cv_ptr;
   
@@ -96,12 +114,28 @@ void Detector::segmentationBasedDetection(const sensor_msgs::Image::ConstPtr& im
       double objectSizeInImage = minRect[0].size.width*minRect[0].size.height;
       
       Z_obj_camfrm = pow((camFx*camFy*objectRealSurfaceArea/objectSizeInImage),0.5);
-      X_obj_camfrm = Z_obj_camfrm*objectCenterIm.x/camFx;
-      Y_obj_camfrm = Z_obj_camfrm*objectCenterIm.y/camFy;
+      X_obj_camfrm = Z_obj_camfrm*(objectCenterIm.x-camCx)/camFx;
+      Y_obj_camfrm = Z_obj_camfrm*(-objectCenterIm.y+camCy)/camFy;
       
-      //std::cout<<"X_obj_camfrm in meter = "<<X_obj_camfrm<<std::endl;
-      //std::cout<<"Y_obj_camfrm in meter = "<<Y_obj_camfrm<<std::endl;
-      //std::cout<<"Z_obj_camfrm in meter = "<<Z_obj_camfrm<<std::endl;      
+  
+      tfObCam.setOrigin( tf::Vector3(X_obj_camfrm, Y_obj_camfrm, Z_obj_camfrm));
+      tf::Quaternion q(0,0,0,1);
+      tfObCam.setRotation(q);
+      
+      br.sendTransform(tf::StampedTransform(tfObCam, actualMessageTime, camRGBOpticalFrameLink, objectLink));
+      br.sendTransform(tf::StampedTransform(tfCamRob, actualMessageTime, robotBaseLink, camBaseLink));      
+      
+//       std::cout<<"objectCenterIm.x in pixels = "<<objectCenterIm.x<<std::endl;
+//       std::cout<<"objectCenterIm.y in pixels = "<<objectCenterIm.y<<std::endl;
+      
+//       std::cout<<"camFx in meter = "<<camFx<<std::endl;
+//       std::cout<<"objectRealSurfaceArea in meter square= "<<objectRealSurfaceArea<<std::endl;
+//       std::cout<<"objectSizeInImage in pixels = "<<objectSizeInImage<<std::endl;    
+// 
+//       
+//       std::cout<<"X_obj_camfrm in meter = "<<X_obj_camfrm<<std::endl;
+//       std::cout<<"Y_obj_camfrm in meter = "<<Y_obj_camfrm<<std::endl;
+//       std::cout<<"Z_obj_camfrm in meter = "<<Z_obj_camfrm<<std::endl;      
 
       
     #ifdef DRAW_DEBUG
@@ -144,8 +178,7 @@ int main(int argc, char* argv[])
     ROS_INFO("Detector provided = %s",argv[1]);
   }
       
-    
-  NodeHandle nh;
+  ros::NodeHandle nh("~");  
   Detector node(nh,argv[1]);
     
   spin();

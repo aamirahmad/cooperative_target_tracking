@@ -51,11 +51,18 @@ class Detector
     string maskImageTopic;
     string maskedImageTopic;
     string camInfoTopic;
+    string robotPoseTopic;
+    
+    string camBaseLink;
+    string camRGBFrameLink;
+    string camRGBOpticalFrameLink;
+    string objectLink;
+    string robotBaseLink;
     
     NodeHandle nh_;
     image_transport::ImageTransport it_;
     image_transport::Subscriber imageSub_;
-    Subscriber camInfoSub_;
+    Subscriber camInfoSub_,robotPoseSub_;
     
     
     int minAreaOfTargetProject;
@@ -65,7 +72,12 @@ class Detector
     double Y_obj_camfrm;
       
     //camera parameters
-    double camFx, camFy;   
+    double camFx, camFy;
+    double camCx, camCy;
+    
+    //tf broadcaster and transforms
+    tf::TransformBroadcaster br;
+    tf::Transform tfObCam,tfCamRob,tfRobWorld;//Object in cam frame,Cam in robot frame, Robot in World frame
   
   public:
     Detector(NodeHandle &_nh, char *detectorType): nh_(_nh), it_(nh_)
@@ -77,6 +89,11 @@ class Detector
       nh_.getParam("minAreaOfTargetProject", minAreaOfTargetProject);
       nh_.getParam("minAreaOfTargetProject", minAreaOfTargetProject);
       nh_.getParam("objectRealSurfaceArea", objectRealSurfaceArea);
+      nh_.getParam("camRGBOpticalFrameLink", camRGBOpticalFrameLink);
+      nh_.getParam("camBaseLink", camBaseLink);
+      nh_.getParam("objectLink", objectLink);
+      nh_.getParam("robotBaseLink", robotBaseLink);      
+      nh_.getParam("robotPoseTopic", robotPoseTopic);     
       
       ROS_INFO("detector type = %s",detectorType);
 
@@ -96,7 +113,15 @@ class Detector
 	}
 		
        // Other subscribers
-       camInfoSub_ = nh_.subscribe<sensor_msgs::CameraInfo>(camInfoTopic, 10,boost::bind(&Detector::storeCameraInfo,this,_1));
+      camInfoSub_ = nh_.subscribe<sensor_msgs::CameraInfo>(camInfoTopic, 10,boost::bind(&Detector::storeCameraInfo,this,_1));
+      
+       // Other subscribers
+      robotPoseSub_ = nh_.subscribe<geometry_msgs::PoseStamped>(robotPoseTopic, 10,boost::bind(&Detector::storeLatestRobotPose,this,_1));      
+       
+       //Setting up fixed transformations if any
+      tfCamRob.setOrigin( tf::Vector3(0.0975,0.0,-0.04603));
+      tf::Quaternion q_1(0.0,0.38,0.0,0.924);
+      tfCamRob.setRotation(q_1);
 
     }
     
@@ -111,15 +136,20 @@ class Detector
      */
     void featureBasedDetection(const sensor_msgs::Image::ConstPtr&);    
     
-     /*! \brief This is a method for detection that combines both the segmentation and feature
-      * -based processes.
-     */
+    /*! \brief This is a method for detection that combines both the segmentation and feature
+    * -based processes.
+    */
     void combinedDetection(const sensor_msgs::Image::ConstPtr&);
     
-     /*! \brief This is a method for reading cam info and storing the params into private variables
-      * of the class
-     */
+    /*! \brief This is a method for reading cam info and storing the params into private variables
+    * of the class
+    */
     void storeCameraInfo(const sensor_msgs::CameraInfo::ConstPtr&);    
     
+    /*! \brief This is a method for reading recent robot pose and storing them into private variables
+    * of the class
+    */
+    void storeLatestRobotPose(const geometry_msgs::PoseStamped::ConstPtr&);    
+      
     
 };
