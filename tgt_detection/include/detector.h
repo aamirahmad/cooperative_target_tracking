@@ -13,6 +13,7 @@
 #include <std_msgs/String.h>
 #include <std_msgs/Float32.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <sensor_msgs/image_encodings.h>
 
 #include <opencv2/imgproc/imgproc.hpp>
@@ -36,6 +37,10 @@
 // #include <visp3/io/vpVideoReader.h>
 // #include <visp_ros/vpROSGrabber.h>
 
+
+//#define TERMINAL_DEBUG
+#undef TERMINAL_DEBUG
+
 //#define DRAW_DEBUG
 #undef DRAW_DEBUG
 
@@ -46,6 +51,10 @@ namespace enc = sensor_msgs::image_encodings;
 
 class Detector
 {
+  
+    double meanFactor;
+    double devFactor;
+    
     bool detectionSucces_; // /*!< true if detector detects the object in the image */
     
     string baseImageTopic;
@@ -65,6 +74,8 @@ class Detector
     image_transport::Subscriber imageSub_;
     Subscriber camInfoSub_,robotPoseSub_;
     Publisher objWorldPub_;
+    ///@hack for February demo. @Fix this
+    Publisher projectedObjWorldPub_; // Publishes pose of the object projected onto the ground plane in the direction of the camera. 
     
     
     int minAreaOfTargetProject;
@@ -83,8 +94,14 @@ class Detector
     tf::TransformListener listenerObjWorld;
     tf::StampedTransform transformObjWorld;
     
+    tf::TransformListener listenerCamWorld;
+    tf::StampedTransform transformCamWorld;
+    
     //detected object pose in world frame
-    geometry_msgs::PoseStamped poseObjWorld;
+    geometry_msgs::PoseWithCovarianceStamped poseObjWorld;
+    ///@hack for February demo. @Fix this
+    tf::Transform tfProjectedObWorld;
+    geometry_msgs::PoseWithCovarianceStamped projectedPoseObjWorld;
   
   public:
     Detector(NodeHandle &_nh, char *detectorType): nh_(_nh), it_(nh_)
@@ -107,6 +124,8 @@ class Detector
 	if(strcmp(detectorType,"HISTOGRAM")==0){
 	        imageSub_ = it_.subscribe(maskImageTopic, 10, boost::bind(&Detector::segmentationBasedDetection,this, _1));
 		ROS_INFO("Detection using purely a color histogram-based segmentation method with image topic = %s",maskImageTopic.c_str());	
+		meanFactor = pow((1+pow(3,0.5))/2,0.5);
+		devFactor = pow(pow(3,0.5)-1,0.5)/2.0;		
 	}
 
 	if(strcmp(detectorType,"FEATURE")==0){
@@ -126,8 +145,10 @@ class Detector
       robotPoseSub_ = nh_.subscribe<geometry_msgs::PoseStamped>(robotPoseTopic, 10,boost::bind(&Detector::storeLatestRobotPose,this,_1));      
       
       // Publishers
-      objWorldPub_ = nh_.advertise<geometry_msgs::PoseStamped>("/fixPoint", 1000);
-       
+      objWorldPub_ = nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>("/fixPoint_actual", 1000);
+      ///@hack for February demo. @Fix this
+      projectedObjWorldPub_ = nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>("/fixPoint", 1000);
+      
        //Setting up fixed transformations if any
       tfCamRob.setOrigin( tf::Vector3(0.0975,0.0,-0.04603));
       tf::Quaternion q_1(0.0,0.38,0.0,0.924);

@@ -39,7 +39,7 @@
     <param name="camRGBFrameLink" value="camera$(arg robotID)_rgb_frame" type="string" />    <param name="camRGBOpticalFrameLink" value="camera$(arg robotID)_rgb_optical_frame" type="string" />  
     <param name="objectLink" value="tracked_object_link" type="string" />  
     <param name="robotPoseTopic" value="/TeleKyb/Vicon/UAV_Octo$(arg robotID)/UAV_Octo$(arg robotID)" type="string" />  
-    <param name="robotBaseLink" value="robotBaseLink" type="string" />  
+    <param name="robotBaseLink" value="base_link" type="string" />  
    </node>
 
 </launch>
