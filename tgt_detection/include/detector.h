@@ -37,6 +37,7 @@
 // #include <visp3/io/vpVideoReader.h>
 // #include <visp_ros/vpROSGrabber.h>
 
+#include <pose_cov_ops/pose_cov_ops.h>
 
 //#define TERMINAL_DEBUG
 #undef TERMINAL_DEBUG
@@ -62,12 +63,14 @@ class Detector
     string maskedImageTopic;
     string camInfoTopic;
     string robotPoseTopic;
+    string projectedObjectLink;
     
     string camBaseLink;
     string camRGBFrameLink;
     string camRGBOpticalFrameLink;
-    string objectLink;
+    string detectedObjectLink;
     string robotBaseLink;
+    string detectedObject_Wframe_Topic;
     
     NodeHandle nh_;
     image_transport::ImageTransport it_;
@@ -99,6 +102,14 @@ class Detector
     
     //detected object pose in world frame
     geometry_msgs::PoseWithCovarianceStamped poseObjWorld;
+    // variables for transforming covariance
+    geometry_msgs::Pose poseObjectRob_;
+    geometry_msgs::Pose poseRobWorld_;
+    geometry_msgs::PoseWithCovariance poseObjWorld_;
+    geometry_msgs::PoseWithCovarianceStamped poseObjWorldStamped_;
+    geometry_msgs::Pose poseOpticalframeWorld_;
+    geometry_msgs::PoseWithCovariance poseObjOpticalframe_;    
+    
     ///@hack for February demo. @Fix this
     tf::Transform tfProjectedObWorld;
     geometry_msgs::PoseWithCovarianceStamped projectedPoseObjWorld;
@@ -115,9 +126,11 @@ class Detector
       nh_.getParam("objectRealSurfaceArea", objectRealSurfaceArea);
       nh_.getParam("camRGBOpticalFrameLink", camRGBOpticalFrameLink);
       nh_.getParam("camBaseLink", camBaseLink);
-      nh_.getParam("objectLink", objectLink);
+      nh_.getParam("detectedObjectLink", detectedObjectLink);
       nh_.getParam("robotBaseLink", robotBaseLink);      
       nh_.getParam("robotPoseTopic", robotPoseTopic);     
+      nh_.getParam("projectedObjectLink", projectedObjectLink);     
+      nh_.getParam("detectedObject_Wframe_Topic", detectedObject_Wframe_Topic); 
       
       ROS_INFO("detector type = %s",detectorType);
 
@@ -147,7 +160,7 @@ class Detector
       // Publishers
       objWorldPub_ = nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>("/fixPoint_actual", 1000);
       ///@hack for February demo. @Fix this
-      projectedObjWorldPub_ = nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>("/fixPoint", 1000);
+      projectedObjWorldPub_ = nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>(detectedObject_Wframe_Topic, 1000);
       
        //Setting up fixed transformations if any
       tfCamRob.setOrigin( tf::Vector3(0.0975,0.0,-0.04603));

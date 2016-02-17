@@ -22,6 +22,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   image_transport
   tf
+  pose_cov_ops
 )
 
 INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS})

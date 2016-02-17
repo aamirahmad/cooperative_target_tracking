@@ -9,6 +9,14 @@ void Detector::storeLatestRobotPose(const geometry_msgs::PoseStamped::ConstPtr& 
   tf::Quaternion q(msg->pose.orientation.x,msg->pose.orientation.y,msg->pose.orientation.z,msg->pose.orientation.w);
   tfRobWorld.setRotation(q);
   
+  poseRobWorld_.position.x = msg->pose.position.x;
+  poseRobWorld_.position.y = msg->pose.position.y;
+  poseRobWorld_.position.z = msg->pose.position.z;
+  poseRobWorld_.orientation.w = msg->pose.orientation.w;
+  poseRobWorld_.orientation.x = msg->pose.orientation.x;
+  poseRobWorld_.orientation.y = msg->pose.orientation.y;
+  poseRobWorld_.orientation.z = msg->pose.orientation.z;
+  
   br.sendTransform(tf::StampedTransform(tfRobWorld, actualMessageTime, "world_link", robotBaseLink));
 }
 
@@ -141,13 +149,13 @@ void Detector::segmentationBasedDetection(const sensor_msgs::Image::ConstPtr& im
 	tf::Quaternion q(0,0,0,1);
 	tfObCam.setRotation(q);
 	
-	br.sendTransform(tf::StampedTransform(tfObCam, actualMessageTime, camRGBOpticalFrameLink, objectLink));
+	br.sendTransform(tf::StampedTransform(tfObCam, actualMessageTime, camRGBOpticalFrameLink, detectedObjectLink));
 	br.sendTransform(tf::StampedTransform(tfCamRob, actualMessageTime, robotBaseLink, camBaseLink));      
 	
 	//Now get the target in the world link frame
 	try
 	{
-	  listenerObjWorld.lookupTransform("/world_link", objectLink, ros::Time(0), transformObjWorld);
+	  listenerObjWorld.lookupTransform("/world_link", detectedObjectLink, ros::Time(0), transformObjWorld);
 	  
 	  poseObjWorld.header.frame_id = "/world_link";
 	  //poseObjWorld.header.stamp = rospy.Time.now();
@@ -156,17 +164,10 @@ void Detector::segmentationBasedDetection(const sensor_msgs::Image::ConstPtr& im
 	  poseObjWorld.pose.pose.position.y = transformObjWorld.getOrigin().y();
 	  poseObjWorld.pose.pose.position.z = transformObjWorld.getOrigin().z();
 	  
-	  poseObjWorld.pose.pose.orientation.w = 1.0;
-	  poseObjWorld.pose.pose.orientation.x = 0.0;
-	  poseObjWorld.pose.pose.orientation.y = 0.0;
-	  poseObjWorld.pose.pose.orientation.z = 0.0;
-
-	  poseObjWorld.pose.covariance[18+3] = 0.01;
-	  poseObjWorld.pose.covariance[24+4] = 0.01;
-	  poseObjWorld.pose.covariance[30+5] = 0.01;
-	  poseObjWorld.pose.covariance[0] = x_dev*x_dev;
-	  poseObjWorld.pose.covariance[7] = y_dev*y_dev;
-	  poseObjWorld.pose.covariance[14] = z_dev*z_dev;
+	  poseObjWorld.pose.pose.orientation.w = transformObjWorld.getRotation().getW();
+	  poseObjWorld.pose.pose.orientation.x = transformObjWorld.getRotation().getX();
+	  poseObjWorld.pose.pose.orientation.y = transformObjWorld.getRotation().getY();
+	  poseObjWorld.pose.pose.orientation.z = transformObjWorld.getRotation().getX();
 	  
 	  objWorldPub_.publish(poseObjWorld);	
 	}      
@@ -203,14 +204,49 @@ void Detector::segmentationBasedDetection(const sensor_msgs::Image::ConstPtr& im
 	    projectedPoseObjWorld.pose.pose.position.y = y1 + b*t;
 	    projectedPoseObjWorld.pose.pose.position.z = 0.0;
 	    
-	    projectedObjWorldPub_.publish(projectedPoseObjWorld);
+	    //projectedObjWorldPub_.publish(projectedPoseObjWorld);
 	    
 	    // Also create a transformation now
 	    tfProjectedObWorld.setOrigin( tf::Vector3(projectedPoseObjWorld.pose.pose.position.x, projectedPoseObjWorld.pose.pose.position.y, 0.0));
 	    tf::Quaternion q1(0,0,0,1);
 	    tfProjectedObWorld.setRotation(q1);
 	    
-	    br.sendTransform(tf::StampedTransform(tfProjectedObWorld, actualMessageTime, "world_link", "projected_objectLink"));	  
+	    br.sendTransform(tf::StampedTransform(tfProjectedObWorld, actualMessageTime, "world_link", projectedObjectLink));	  
+	    
+	    
+	    poseOpticalframeWorld_.position.x = x2;
+	    poseOpticalframeWorld_.position.y = y2;
+	    poseOpticalframeWorld_.position.z = z2;
+	    
+	    poseOpticalframeWorld_.orientation.w = transformCamWorld.getRotation().getW();
+	    poseOpticalframeWorld_.orientation.x = transformCamWorld.getRotation().getX();
+	    poseOpticalframeWorld_.orientation.y = transformCamWorld.getRotation().getY();
+	    poseOpticalframeWorld_.orientation.z = transformCamWorld.getRotation().getZ();
+	    
+	    poseObjOpticalframe_.pose.position.x = x_mean;
+	    poseObjOpticalframe_.pose.position.y = y_mean;
+	    poseObjOpticalframe_.pose.position.z = z_mean;
+	    
+	    poseObjOpticalframe_.pose.orientation.w = 1;
+	    poseObjOpticalframe_.pose.orientation.x = 0;
+	    poseObjOpticalframe_.pose.orientation.y = 0;
+	    poseObjOpticalframe_.pose.orientation.z = 0;
+	    
+	    poseObjOpticalframe_.covariance[18+3] = 0.01;
+	    poseObjOpticalframe_.covariance[24+4] = 0.01;
+	    poseObjOpticalframe_.covariance[30+5] = 0.01;
+	    poseObjOpticalframe_.covariance[0] = x_dev*x_dev;
+	    poseObjOpticalframe_.covariance[7] = y_dev*y_dev;
+	    poseObjOpticalframe_.covariance[14] = z_dev*z_dev;	    
+	    
+	    
+	    pose_cov_ops::compose(poseOpticalframeWorld_,poseObjOpticalframe_,  poseObjWorld_);
+
+	    poseObjWorldStamped_.pose = poseObjWorld_;
+	    poseObjWorldStamped_.header.frame_id = "/world_link";
+	    poseObjWorldStamped_.header.stamp = actualMessageTime;
+	    projectedObjWorldPub_.publish(poseObjWorldStamped_);
+	    
 	  }     
 	  
 	  catch (tf::TransformException &ex) 
