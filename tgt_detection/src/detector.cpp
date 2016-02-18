@@ -186,22 +186,20 @@ void Detector::segmentationBasedDetection(const sensor_msgs::Image::ConstPtr& im
 	  {
 	    listenerCamWorld.lookupTransform("/world_link", camRGBOpticalFrameLink, ros::Time(0), transformCamWorld);
 	    
-	    double x1,y1,z1,x2,y2,z2;
+	    objWorldFrame[0] = poseObjWorld.pose.pose.position.x;
+	    objWorldFrame[1] = poseObjWorld.pose.pose.position.y;
+	    objWorldFrame[2] = poseObjWorld.pose.pose.position.z;	  
 	    
-	    x1 = poseObjWorld.pose.pose.position.x;
-	    y1 = poseObjWorld.pose.pose.position.y;
-	    z1 = poseObjWorld.pose.pose.position.z;	  
+	    camOptCenterWorld[0] = transformCamWorld.getOrigin().x();
+	    camOptCenterWorld[1] = transformCamWorld.getOrigin().y();
+	    camOptCenterWorld[2] = transformCamWorld.getOrigin().z();
 	    
-	    x2 = transformCamWorld.getOrigin().x();
-	    y2 = transformCamWorld.getOrigin().y();
-	    z2 = transformCamWorld.getOrigin().z();
-	    
-	    double a = x2-x1; double b = y2-y1; double c = z2-z1; double t=0;
+	    double a = camOptCenterWorld[0]-objWorldFrame[0]; double b = camOptCenterWorld[1]-objWorldFrame[1]; double c = camOptCenterWorld[2]-objWorldFrame[2]; double t=0;
 	    if(c!=0)
-	      t = (0-z1)/c; // intersecting the line with the plane z=0
+	      t = (0-objWorldFrame[2])/c; // intersecting the line with the plane z=0
 	      
-	    projectedPoseObjWorld.pose.pose.position.x = x1 + a*t;
-	    projectedPoseObjWorld.pose.pose.position.y = y1 + b*t;
+	    projectedPoseObjWorld.pose.pose.position.x = objWorldFrame[0] + a*t;
+	    projectedPoseObjWorld.pose.pose.position.y = objWorldFrame[1] + b*t;
 	    projectedPoseObjWorld.pose.pose.position.z = 0.0;
 	    
 	    //projectedObjWorldPub_.publish(projectedPoseObjWorld);
@@ -211,21 +209,36 @@ void Detector::segmentationBasedDetection(const sensor_msgs::Image::ConstPtr& im
 	    tf::Quaternion q1(0,0,0,1);
 	    tfProjectedObWorld.setRotation(q1);
 	    
-	    br.sendTransform(tf::StampedTransform(tfProjectedObWorld, actualMessageTime, "world_link", projectedObjectLink));	  
+	    br.sendTransform(tf::StampedTransform(tfProjectedObWorld, actualMessageTime, "world_link", projectedObjectLink));	  	    
+	  }     
+	  
+	  catch (tf::TransformException &ex) 
+	  {
+	    ROS_WARN("%s",ex.what());
+	    ros::Duration(1.0).sleep();
+	    return;
+	  }   
+	}
+	{
+	  try
+	  {
+	    listenerprojObjCam.lookupTransform(camRGBOpticalFrameLink,projectedObjectLink, ros::Time(0), transformprojObjCam);
 	    
 	    
-	    poseOpticalframeWorld_.position.x = x2;
-	    poseOpticalframeWorld_.position.y = y2;
-	    poseOpticalframeWorld_.position.z = z2;
+	    
+	    poseOpticalframeWorld_.position.x = camOptCenterWorld[0];
+	    poseOpticalframeWorld_.position.y = camOptCenterWorld[1];
+	    poseOpticalframeWorld_.position.z = camOptCenterWorld[2];
 	    
 	    poseOpticalframeWorld_.orientation.w = transformCamWorld.getRotation().getW();
 	    poseOpticalframeWorld_.orientation.x = transformCamWorld.getRotation().getX();
 	    poseOpticalframeWorld_.orientation.y = transformCamWorld.getRotation().getY();
 	    poseOpticalframeWorld_.orientation.z = transformCamWorld.getRotation().getZ();
 	    
-	    poseObjOpticalframe_.pose.position.x = x_mean;
-	    poseObjOpticalframe_.pose.position.y = y_mean;
-	    poseObjOpticalframe_.pose.position.z = z_mean;
+	    ///@hack this is now the ground-projected pose of object in the camera frame 
+	    poseObjOpticalframe_.pose.position.x = transformprojObjCam.getOrigin().x();
+	    poseObjOpticalframe_.pose.position.y = transformprojObjCam.getOrigin().y();
+	    poseObjOpticalframe_.pose.position.z = transformprojObjCam.getOrigin().z();
 	    
 	    poseObjOpticalframe_.pose.orientation.w = 1;
 	    poseObjOpticalframe_.pose.orientation.x = 0;
@@ -255,7 +268,7 @@ void Detector::segmentationBasedDetection(const sensor_msgs::Image::ConstPtr& im
 	    ros::Duration(1.0).sleep();
 	    return;
 	  }   
-	}
+	}	
 	
       #ifdef TERMINAL_DEBUG
       

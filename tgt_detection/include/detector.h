@@ -86,6 +86,10 @@ class Detector
     double Z_obj_camfrm;
     double X_obj_camfrm;
     double Y_obj_camfrm;
+     ///@hack for February demo. @Fix this
+    double camOptCenterWorld[3];
+    double objWorldFrame[3];
+    double projObjWorldFrame[3];
       
     //camera parameters
     double camFx, camFy;
@@ -99,6 +103,9 @@ class Detector
     
     tf::TransformListener listenerCamWorld;
     tf::StampedTransform transformCamWorld;
+    
+    tf::TransformListener listenerprojObjCam;
+    tf::StampedTransform transformprojObjCam;    
     
     //detected object pose in world frame
     geometry_msgs::PoseWithCovarianceStamped poseObjWorld;
