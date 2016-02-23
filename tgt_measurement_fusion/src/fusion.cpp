@@ -111,16 +111,6 @@ int main(int argc, char* argv[])
   
   ros::init(argc, argv, "tgt_fusor");
 
-//   if (argc < 2)
-//     {
-//       ROS_WARN("WARNING: ADD SOME WARNING if you need arguments \n");
-//       return 1;
-//     }
-//   else
-//   {
-//     ROS_INFO("Detector provided = %s",argv[1]);
-//   }
-      
   ros::NodeHandle nh;  
   Fusor node(nh);
     
