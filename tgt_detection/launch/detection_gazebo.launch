@@ -13,7 +13,7 @@
   
  
 
-  <node name="histogram_segmentation$(arg robotID)" pkg="pal_vision_segmentation" type="histogram_segmentation" args="$(find tgt_detection)/etc/histogram_templates/ybox_old.png" >
+  <node name="histogram_segmentation$(arg robotID)" pkg="pal_vision_segmentation" type="histogram_segmentation" args="$(find tgt_detection)/etc/histogram_templates/ybox_gazebo.png" >
     <param name="dilate_iterations" value="5" type="int" />
     <param name="dilate_size" value="3" type="int" />  
     <param name="erode_iterations" value="1" type="int" />
