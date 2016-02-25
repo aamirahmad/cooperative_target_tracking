@@ -6,12 +6,12 @@
 <!--   <arg name="robotID" default="44" /> -->
   <arg name="robotID" default=""/>
 
-  
-  <arg name="base_image" default="/camera$(arg robotID)/rgb/image_raw" />
+  <arg name="base_image" default="/firefly$(arg robotID)/xtion/rgb/image_raw" />
   <arg name="mask_image" default="/histogram_segmentation$(arg robotID)/mask" />  
   <arg name="segmented_image" default="/histogram_segmentation$(arg robotID)/image_masked" />
-  <arg name="camInfo" default="/camera$(arg robotID)/rgb/camera_info" />  
-
+  <arg name="camInfo" default="/firefly$(arg robotID)/xtion/rgb/camera_info" />
+  
+ 
 
   <node name="histogram_segmentation$(arg robotID)" pkg="pal_vision_segmentation" type="histogram_segmentation" args="$(find tgt_detection)/etc/histogram_templates/ybox_old.png" >
     <param name="dilate_iterations" value="5" type="int" />
@@ -36,8 +36,8 @@
     <param name="detectedObject_Wframe_Topic" value="detectedObject_Wframe_byRobot$(arg robotID)" type="string" />   
     <param name="camInfoTopic" value="$(arg camInfo)" type="string" />         
     <param name="segmented_image_topic" value="$(arg segmented_image)" type="string" />
-    <param name="camBaseLink" value="camera$(arg robotID)_link" type="string" /> 
-    <param name="camRGBFrameLink" value="camera$(arg robotID)_rgb_frame" type="string" />    <param name="camRGBOpticalFrameLink" value="camera$(arg robotID)_rgb_optical_frame" type="string" />  
+    <param name="camBaseLink" value="firefly$(arg robotID)/xtion/_link" type="string" /> 
+    <param name="camRGBFrameLink" value="firefly$(arg robotID)/xtion/rgb_frame" type="string" />    <param name="camRGBOpticalFrameLink" value="firefly$(arg robotID)/xtion/_rgb_optical_frame" type="string" />  
     <param name="detectedObjectLink" value="detected_object_link_by_robot$(arg robotID)" type="string" />  
     <param name="projectedObjectLink" value="projected_detected_object_link_by_robot$(arg robotID)" type="string" />  
     <param name="robotPoseTopic" value="/TeleKyb/Vicon/UAV_Octo$(arg robotID)/UAV_Octo$(arg robotID)" type="string" />  

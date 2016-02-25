@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(tgt_detection)
 
+find_package(cmake_modules REQUIRED)
+
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
@@ -16,12 +18,13 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
-  visp_ros
+#   visp_ros
   cv_bridge
   sensor_msgs
   geometry_msgs
   image_transport
   tf
+  pose_cov_ops
 )
 
 INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS})

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<launch>
+
+  
+<!--   <include file="$(find openni2_launch)/launch/openni2.launch"/> -->
+<!--   <arg name="robotID" default="44" /> -->
+  <arg name="robotID" default=""/>
+  
+  <param name="trackedStateEstimateTopicName" value="trackedObjectState_byRobot$(arg robotID)" type="string" />  
+  <param name="measurementTopicName" value="fusedObject_Wframe_byRobot$(arg robotID)"/> type="string"
+  
+  <node name="tgt_tracker$(arg robotID)" pkg="tgt_tracking" type="tgt_tracker" output="screen">
+    
+  </node>
+
+</launch>
