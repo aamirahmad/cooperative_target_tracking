@@ -36,12 +36,12 @@
     <param name="detectedObject_Wframe_Topic" value="detectedObject_Wframe_byRobot$(arg robotID)" type="string" />   
     <param name="camInfoTopic" value="$(arg camInfo)" type="string" />         
     <param name="segmented_image_topic" value="$(arg segmented_image)" type="string" />
-    <param name="camBaseLink" value="firefly$(arg robotID)/xtion/_link" type="string" /> 
-    <param name="camRGBFrameLink" value="firefly$(arg robotID)/xtion/rgb_frame" type="string" />    <param name="camRGBOpticalFrameLink" value="firefly$(arg robotID)/xtion/_rgb_optical_frame" type="string" />  
+    <param name="camBaseLink" value="firefly$(arg robotID)/xtion_link" type="string" /> 
+    <param name="camRGBFrameLink" value="firefly$(arg robotID)/xtion_rgb_frame" type="string" />    <param name="camRGBOpticalFrameLink" value="firefly$(arg robotID)/xtion_rgb_optical_frame" type="string" />  
     <param name="detectedObjectLink" value="detected_object_link_by_robot$(arg robotID)" type="string" />  
     <param name="projectedObjectLink" value="projected_detected_object_link_by_robot$(arg robotID)" type="string" />  
     <param name="robotPoseTopic" value="/TeleKyb/Vicon/UAV_Octo$(arg robotID)/UAV_Octo$(arg robotID)" type="string" />  
-    <param name="robotBaseLink" value="base_link_robot$(arg robotID)" type="string" />  
+    <param name="robotBaseLink" value="firefly$(arg robotID)/base_link" type="string" />  
    </node>
 
 </launch>
