@@ -17,7 +17,7 @@ void Detector::storeLatestRobotPose(const geometry_msgs::PoseStamped::ConstPtr& 
   poseRobWorld_.orientation.y = msg->pose.orientation.y;
   poseRobWorld_.orientation.z = msg->pose.orientation.z;
   
-  br.sendTransform(tf::StampedTransform(tfRobWorld, actualMessageTime, "world_link", robotBaseLink));
+//   br.sendTransform(tf::StampedTransform(tfRobWorld, actualMessageTime, "world_link", robotBaseLink));
 }
 
 
@@ -62,6 +62,8 @@ void Detector::segmentationBasedDetection(const sensor_msgs::Image::ConstPtr& im
   //ROS_INFO("Received a mask Image");
   ros::Time actualMessageTime(image->header.stamp.sec, image->header.stamp.nsec);
 
+  br.sendTransform(tf::StampedTransform(tfCamRob, actualMessageTime, robotBaseLink, camBaseLink));   
+  
   cv_bridge::CvImagePtr cv_ptr;
   
   try
@@ -149,8 +151,7 @@ void Detector::segmentationBasedDetection(const sensor_msgs::Image::ConstPtr& im
 	tf::Quaternion q(0,0,0,1);
 	tfObCam.setRotation(q);
 	
-	br.sendTransform(tf::StampedTransform(tfObCam, actualMessageTime, camRGBOpticalFrameLink, detectedObjectLink));
-	br.sendTransform(tf::StampedTransform(tfCamRob, actualMessageTime, robotBaseLink, camBaseLink));      
+	br.sendTransform(tf::StampedTransform(tfObCam, actualMessageTime, camRGBOpticalFrameLink, detectedObjectLink));   
 	
 	//Now get the target in the world link frame
 	try
