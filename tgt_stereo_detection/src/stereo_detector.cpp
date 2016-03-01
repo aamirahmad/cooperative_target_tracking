@@ -157,7 +157,7 @@ void Stereo_Detector::performStereoMatching()
     
     // Now find the closest point on the line made by  p1_cam2 and p2_cam2 from the mateBlob.poses[0], i.e. from the center of the mate blob
     
-    geometry_msgs::Pose p3_cam2, p_closest_cam2, Q1_cam2;
+    geometry_msgs::Pose p3_cam2, p_closest_cam2, Q1_cam2, Q1_cam2_naive;
     
     p3_cam2.position.x = mateBlob.poses[0].position.x - mate_camCx;
     p3_cam2.position.y = mateBlob.poses[0].position.y - mate_camCy;    
@@ -175,12 +175,24 @@ void Stereo_Detector::performStereoMatching()
     Q1_cam2.position.z = 1.0;
     transform1.setOrigin(tf::Vector3(Q1_cam2.position.x, Q1_cam2.position.y, Q1_cam2.position.z));
     br.sendTransform(tf::StampedTransform(transform1, selfMessageTime, mateCamRGBOpticalFrameLink, Q1_cam2_link));    
+   
+     ///@TODO this is only to compare a baseline naive approach
+    Q1_cam2_naive.position.x = 1.0*p3_cam2.position.x/(mate_camFx);
+    Q1_cam2_naive.position.y = 1.0*p3_cam2.position.y/(mate_camFy);
+    Q1_cam2_naive.position.z = 1.0;
+    transform1.setOrigin(tf::Vector3(Q1_cam2_naive.position.x, Q1_cam2_naive.position.y, Q1_cam2_naive.position.z));
+    br.sendTransform(tf::StampedTransform(transform1, selfMessageTime, mateCamRGBOpticalFrameLink, Q1_cam2_naive_link));     
+    
+    
+   
+    
+    
     
     //ROS_INFO("p_closest_cam2.position.x = %f",p_closest_cam2.position.x);
     //ROS_INFO("p_closest_cam2.position.y = %f",p_closest_cam2.position.y);
     
     //now prepare to find the actual 3D point.
-    XYZ P1,P2,P3,P4,Pa,Pb; double mua,mub;
+    XYZ P1,P2,P3,P4,P4_naive,Pa,Pb,Pa_naive,Pb_naive; double mua,mub,muaNaive,mubNaive;
 	try
 	{
 	  lr.lookupTransform("world_link", selfCamRGBOpticalFrameLink, ros::Time(0), genericTransformation);
@@ -244,9 +256,25 @@ void Stereo_Detector::performStereoMatching()
 	  ros::Duration(1.0).sleep();
 	  return;
 	}
+	try
+	{
+	  lr.lookupTransform("world_link", Q1_cam2_naive_link, ros::Time(0), genericTransformation);
+
+	  P4_naive.x = genericTransformation.getOrigin().x();
+	  P4_naive.y = genericTransformation.getOrigin().y();
+	  P4_naive.z = genericTransformation.getOrigin().z();
+	}      
 	
-    bool lineIntersectionSuccess = false;	
+	catch (tf::TransformException &ex) 
+	{
+	  ROS_WARN("%s",ex.what());
+	  ros::Duration(1.0).sleep();
+	  return;
+	}	
+	
+    bool lineIntersectionSuccess = false,lineIntersectionSuccessNaive = false;	
     lineIntersectionSuccess = LineLineIntersect(P1,P2,P3,P4,&Pa,&Pb,&mua,&mub);
+    lineIntersectionSuccessNaive = LineLineIntersect(P1,P2,P3,P4_naive,&Pa_naive,&Pb_naive,&muaNaive,&mubNaive);
     //ROS_INFO("PaX = %f",Pa.x);
     //ROS_INFO("PaY = %f",Pa.y);
     //ROS_INFO("PaZ = %f",Pa.z);
@@ -336,7 +364,7 @@ void Stereo_Detector::performStereoMatching()
 	  pose_cov_ops::compose(poseOpticalframeWorld_,poseObjOpticalframe_,  poseObjWorld_);
 	  
 	  //replace tgt_WFrame with the new thing after covariance transformation!
-	  tgt_WFrame.pose = poseObjWorld_;	  
+	  tgt_WFrame.pose.covariance = poseObjWorld_.covariance;	  
 	  
 	}      
 	
@@ -350,9 +378,27 @@ void Stereo_Detector::performStereoMatching()
       
 	
 	objWorldPub_.publish(tgt_WFrame);
-      }
-      
+      }  
     }
+    
+    if(lineIntersectionSuccessNaive)
+    {
+      geometry_msgs::PoseWithCovarianceStamped tgt_WFrame;
+      
+      tgt_WFrame.pose.pose.position.x = (Pa_naive.x + Pb_naive.x)/2;
+      tgt_WFrame.pose.pose.position.y = (Pa_naive.y + Pb_naive.y)/2;
+      tgt_WFrame.pose.pose.position.z = (Pa_naive.z + Pb_naive.z)/2;
+      tgt_WFrame.pose.pose.orientation.w = 1;
+      tgt_WFrame.pose.pose.orientation.x = 0;
+      tgt_WFrame.pose.pose.orientation.y = 0;
+      tgt_WFrame.pose.pose.orientation.z = 0; 
+      tgt_WFrame.header.frame_id = "/world_link";
+      tgt_WFrame.header.stamp = selfMessageTime;
+	
+      objWorldPubNaive_.publish(tgt_WFrame);
+    }
+    
+       
   }
 
 }

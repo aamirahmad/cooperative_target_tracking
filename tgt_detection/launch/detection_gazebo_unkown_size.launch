@@ -6,14 +6,14 @@
 <!--   <arg name="robotID" default="44" /> -->
   <arg name="robotID" default=""/>
 
-  
-  <arg name="base_image" default="/camera$(arg robotID)/rgb/image_raw" />
+  <arg name="base_image" default="/firefly$(arg robotID)/xtion/rgb/image_raw" />
   <arg name="mask_image" default="/histogram_segmentation$(arg robotID)/mask" />  
   <arg name="segmented_image" default="/histogram_segmentation$(arg robotID)/image_masked" />
-  <arg name="camInfo" default="/camera$(arg robotID)/rgb/camera_info" />  
+  <arg name="camInfo" default="/firefly$(arg robotID)/xtion/rgb/camera_info" />
+  
+ 
 
-
-  <node name="histogram_segmentation$(arg robotID)" pkg="pal_vision_segmentation" type="histogram_segmentation" args="$(find tgt_detection)/etc/histogram_templates/ybox_old.png" >
+  <node name="histogram_segmentation$(arg robotID)" pkg="pal_vision_segmentation" type="histogram_segmentation" args="$(find tgt_detection)/etc/histogram_templates/ybox_gazebo.png" >
     <param name="dilate_iterations" value="5" type="int" />
     <param name="dilate_size" value="3" type="int" />  
     <param name="erode_iterations" value="1" type="int" />
@@ -25,7 +25,7 @@
     <remap from="/image" to="$(arg base_image)"/>    
     </node>  
      
-  <node name="tgt_detector$(arg robotID)" pkg="tgt_detection" type="tgt_detector" args="HISTOGRAM KNOWN_SIZE" output="screen">
+  <node name="tgt_detector$(arg robotID)" pkg="tgt_detection" type="tgt_detector" args="HISTOGRAM UNKNOWN_SIZE" output="screen">
     <!-- This area is in pixels -->    
     <param name="minAreaOfTargetProject" value="500" type="int" /> 
     <!-- This area is in square meter -->    
@@ -36,13 +36,13 @@
     <param name="detectedObject_Wframe_Topic" value="detectedObject_Wframe_byRobot$(arg robotID)" type="string" />   
     <param name="camInfoTopic" value="$(arg camInfo)" type="string" />         
     <param name="segmented_image_topic" value="$(arg segmented_image)" type="string" />
-    <param name="camBaseLink" value="camera$(arg robotID)_link" type="string" /> 
-    <param name="camRGBFrameLink" value="camera$(arg robotID)_rgb_frame" type="string" />    <param name="camRGBOpticalFrameLink" value="camera$(arg robotID)_rgb_optical_frame" type="string" />  
+    <param name="camBaseLink" value="firefly$(arg robotID)/xtion_link" type="string" /> 
+    <param name="camRGBFrameLink" value="firefly$(arg robotID)/xtion_rgb_frame" type="string" />    <param name="camRGBOpticalFrameLink" value="firefly$(arg robotID)/xtion_rgb_optical_frame" type="string" />  
     <param name="detectedObjectLink" value="detected_object_link_by_robot$(arg robotID)" type="string" />  
     <param name="projectedObjectLink" value="projected_detected_object_link_by_robot$(arg robotID)" type="string" />  
     <param name="robotPoseTopic" value="/TeleKyb/Vicon/UAV_Octo$(arg robotID)/UAV_Octo$(arg robotID)" type="string" />  
-    <param name="robotBaseLink" value="base_link_robot$(arg robotID)" type="string" /> 
-    <param name="targetBlobTopic" value="targetBlobInCamera$(arg robotID)" type="string" />
+    <param name="robotBaseLink" value="firefly$(arg robotID)/base_link" type="string" /> 
+    <param name="targetBlobTopic" value="targetBlobInCamera$(arg robotID)" type="string" />  
    </node>
 
 </launch>

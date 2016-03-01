@@ -82,8 +82,10 @@ class Stereo_Detector
     string detectedObjectLink;
     string projectedObjectLink;    
     string detectedObject_Wframe_Topic;
+    string detectedObject_WframeNaive_Topic;
 
     string P1_cam1_link,P2_cam1_link,Q1_cam2_link;
+    string Q1_cam2_naive_link;
     
     
     string selfBlobTopicName;
@@ -95,6 +97,7 @@ class Stereo_Detector
     NodeHandle nh_;
     Subscriber selfCamInfoSub_,mateCamInfoSub_,blobinImageSub_;
     Publisher objWorldPub_;
+    Publisher objWorldPubNaive_;
     
     //camera parameters of self
     double self_camFx, self_camFy;
@@ -135,10 +138,12 @@ class Stereo_Detector
       nh_.getParam("detectedObjectLink", detectedObjectLink); 
       nh_.getParam("projectedObjectLink", projectedObjectLink); 
       nh_.getParam("detectedObject_Wframe_Topic", detectedObject_Wframe_Topic); 
+      nh_.getParam("detectedObject_WframeNaive_Topic", detectedObject_WframeNaive_Topic);
       
       nh_.getParam("P1_cam1", P1_cam1_link); 
       nh_.getParam("P2_cam1", P2_cam1_link); 
       nh_.getParam("Q1_cam2", Q1_cam2_link);       
+      nh_.getParam("Q1_cam2_naive", Q1_cam2_naive_link); 
       
       nh_.getParam("selfBlobTopicName", selfBlobTopicName); 
       nh_.getParam("mateBlobTopicName", mateBlobTopicName); 
@@ -157,7 +162,7 @@ class Stereo_Detector
       mateBlobSub_ = nh_.subscribe<geometry_msgs::PoseArray>(mateBlobTopicName, 10,boost::bind(&Stereo_Detector::mateBlobCallBack,this,_1));       
       
       objWorldPub_ = nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>(detectedObject_Wframe_Topic, 1000);
-      
+      objWorldPubNaive_ = nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>(detectedObject_WframeNaive_Topic, 1000);
 
     }
     
