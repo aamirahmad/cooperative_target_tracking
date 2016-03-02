@@ -235,7 +235,7 @@ int main(int argc, char* argv[])
     ros::Duration timediff = node.currentGTtime - node.firstGTtime;
     //ROS_INFO("timediff in seconds = %f",timediff.toSec());
     
-    if(fabs(timediff.toSec()) > 45.0)
+    if(fabs(timediff.toSec()) > 360.0)
     {
       node.finalEvaluation();
       ros::shutdown();

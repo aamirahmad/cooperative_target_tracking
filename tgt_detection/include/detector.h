@@ -78,7 +78,7 @@ class Detector
     NodeHandle nh_;
     image_transport::ImageTransport it_;
     image_transport::Subscriber imageSub_;
-    Subscriber camInfoSub_,robotPoseSub_;
+    Subscriber camInfoSub_,robotPoseSub_,objectGTPoseSub_;
     Publisher objWorldPub_;
     ///@hack for February demo. @Fix this
     Publisher projectedObjWorldPub_; // Publishes pose of the object projected onto the ground plane in the direction of the camera. 
@@ -176,7 +176,14 @@ class Detector
       camInfoSub_ = nh_.subscribe<sensor_msgs::CameraInfo>(camInfoTopic, 10,boost::bind(&Detector::storeCameraInfo,this,_1));
       
        // Other subscribers
-      robotPoseSub_ = nh_.subscribe<geometry_msgs::PoseStamped>(robotPoseTopic, 10,boost::bind(&Detector::storeLatestRobotPose,this,_1));      
+      robotPoseSub_ = nh_.subscribe<geometry_msgs::PoseStamped>(robotPoseTopic, 10,boost::bind(&Detector::storeLatestRobotPose,this,_1));
+
+      if(strcmp(robotPoseTopic.c_str(),"/TeleKyb/Vicon/UAV_Octo_43/UAV_Octo_43")==0)
+      {
+	ROS_INFO("robotino subscribed");
+	
+	objectGTPoseSub_ = nh_.subscribe<geometry_msgs::PoseStamped>("/TeleKyb/Vicon/UAV_Robotino/UAV_Robotino", 10,boost::bind(&Detector::storeLatestObjectGTPose,this,_1));      
+      }
       
       // Publishers
       objWorldPub_ = nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>("/fixPoint_actual", 1000);
@@ -225,6 +232,7 @@ class Detector
     * of the class
     */
     void storeLatestRobotPose(const geometry_msgs::PoseStamped::ConstPtr&);    
-      
+    
+    void storeLatestObjectGTPose(const geometry_msgs::PoseStamped::ConstPtr&); 
     
 };

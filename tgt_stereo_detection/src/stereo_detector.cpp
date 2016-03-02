@@ -84,7 +84,32 @@ void Stereo_Detector::performStereoMatching()
   
   if(timediffInSec > -thresholdTimeInSec && timediffInSec < thresholdTimeInSec)
   {
+
+    ROS_INFO("performStereoMatching");
     //perform stereo matching because we have some coherence in time
+    
+    
+    try
+    {
+      //lr.waitForTransform(mateCamRGBOpticalFrameLink, P1_cam1_link,mateMessageTime, ros::Duration(3.0));
+      lr.lookupTransform("/world_link", selfCamRGBOpticalFrameLink, ros::Time(0), SelfOptFrameInWorldTransform);
+    }      
+    
+    catch (tf::TransformException &ex) 
+    {
+      ROS_WARN("%s",ex.what());
+      return;
+    }  
+    try
+    {
+      lr.lookupTransform("/world_link", mateCamRGBOpticalFrameLink, ros::Time(0), mateOptFrameInWorldTransform);
+    }      
+    
+    catch (tf::TransformException &ex) 
+    {
+      ROS_WARN("%s",ex.what());
+      return;
+    }      
     
     //see the technical report for the variable notations.
     geometry_msgs::Pose P1_cam1, P2_cam1,
@@ -119,6 +144,7 @@ void Stereo_Detector::performStereoMatching()
 
 	try
 	{
+	 //lr.waitForTransform(mateCamRGBOpticalFrameLink, P1_cam1_link,mateMessageTime, ros::Duration(3.0));
 	  lr.lookupTransform(mateCamRGBOpticalFrameLink, P1_cam1_link, ros::Time(0), genericTransformation);
 
 	  P1_cam2.position.x = genericTransformation.getOrigin().x();
@@ -129,11 +155,12 @@ void Stereo_Detector::performStereoMatching()
 	catch (tf::TransformException &ex) 
 	{
 	  ROS_WARN("%s",ex.what());
-	  ros::Duration(1.0).sleep();
+	  
 	  return;
 	}          
 	try
 	{
+	  //lr.waitForTransform(mateCamRGBOpticalFrameLink, P2_cam1_link, mateMessageTime, ros::Duration(3.0));
 	  lr.lookupTransform(mateCamRGBOpticalFrameLink, P2_cam1_link, ros::Time(0), genericTransformation);
 
 	  P2_cam2.position.x = genericTransformation.getOrigin().x();
@@ -144,7 +171,7 @@ void Stereo_Detector::performStereoMatching()
 	catch (tf::TransformException &ex) 
 	{
 	  ROS_WARN("%s",ex.what());
-	  ros::Duration(1.0).sleep();
+	  
 	  return;
 	}
 	
@@ -193,24 +220,19 @@ void Stereo_Detector::performStereoMatching()
     
     //now prepare to find the actual 3D point.
     XYZ P1,P2,P3,P4,P4_naive,Pa,Pb,Pa_naive,Pb_naive; double mua,mub,muaNaive,mubNaive;
-	try
-	{
-	  lr.lookupTransform("world_link", selfCamRGBOpticalFrameLink, ros::Time(0), genericTransformation);
 
-	  P1.x = genericTransformation.getOrigin().x();
-	  P1.y = genericTransformation.getOrigin().y();
-	  P1.z = genericTransformation.getOrigin().z();
-	}      
-	
-	catch (tf::TransformException &ex) 
-	{
-	  ROS_WARN("%s",ex.what());
-	  ros::Duration(1.0).sleep();
-	  return;
-	}  
+	  P1.x = SelfOptFrameInWorldTransform.getOrigin().x();
+	  P1.y = SelfOptFrameInWorldTransform.getOrigin().y();
+	  P1.z = SelfOptFrameInWorldTransform.getOrigin().z();
+	  
+	  P3.x = mateOptFrameInWorldTransform.getOrigin().x();
+	  P3.y = mateOptFrameInWorldTransform.getOrigin().y();
+	  P3.z = mateOptFrameInWorldTransform.getOrigin().z();
+
 	
 	try
 	{
+	  //lr.waitForTransform("world_link", P2_cam1_link, selfMessageTime,  ros::Duration(3.0));
 	  lr.lookupTransform("world_link", P2_cam1_link, ros::Time(0), genericTransformation);
 
 	  P2.x = genericTransformation.getOrigin().x();
@@ -221,28 +243,13 @@ void Stereo_Detector::performStereoMatching()
 	catch (tf::TransformException &ex) 
 	{
 	  ROS_WARN("%s",ex.what());
-	  ros::Duration(1.0).sleep();
+	  
 	  return;
 	} 
-	
-	try
-	{
-	  lr.lookupTransform("world_link", mateCamRGBOpticalFrameLink, ros::Time(0), genericTransformation);
 
-	  P3.x = genericTransformation.getOrigin().x();
-	  P3.y = genericTransformation.getOrigin().y();
-	  P3.z = genericTransformation.getOrigin().z();
-	}      
-	
-	catch (tf::TransformException &ex) 
-	{
-	  ROS_WARN("%s",ex.what());
-	  ros::Duration(1.0).sleep();
-	  return;
-	}
-	
 	try
 	{
+	  //lr.waitForTransform("world_link", Q1_cam2_link, mateMessageTime, ros::Duration(3.0));
 	  lr.lookupTransform("world_link", Q1_cam2_link, ros::Time(0), genericTransformation);
 
 	  P4.x = genericTransformation.getOrigin().x();
@@ -253,11 +260,12 @@ void Stereo_Detector::performStereoMatching()
 	catch (tf::TransformException &ex) 
 	{
 	  ROS_WARN("%s",ex.what());
-	  ros::Duration(1.0).sleep();
+	  
 	  return;
 	}
 	try
 	{
+	  //lr.waitForTransform("world_link", Q1_cam2_naive_link, mateMessageTime, ros::Duration(3.0));
 	  lr.lookupTransform("world_link", Q1_cam2_naive_link, ros::Time(0), genericTransformation);
 
 	  P4_naive.x = genericTransformation.getOrigin().x();
@@ -268,7 +276,7 @@ void Stereo_Detector::performStereoMatching()
 	catch (tf::TransformException &ex) 
 	{
 	  ROS_WARN("%s",ex.what());
-	  ros::Duration(1.0).sleep();
+	  
 	  return;
 	}	
 	
@@ -296,9 +304,9 @@ void Stereo_Detector::performStereoMatching()
       tgt_WFrame.header.frame_id = "/world_link";
       tgt_WFrame.header.stamp = selfMessageTime;
       
-      //ROS_INFO("distClosestPointFromBlobCenter in pixels = %f",distClosestPointFromBlobCenter);
-      //ROS_INFO("MateBlobWidth = %f",mateBlob.poses[5].position.x);
-      //ROS_INFO("MateBlobHeight = %f",mateBlob.poses[5].position.);      
+      //ROS_INFO("Pa.x - Pb.x = %f",Pa.x - Pb.x);
+      //ROS_INFO("Pa.y - Pb.y = %f",Pa.y - Pb.y);
+      //ROS_INFO("Pa.z - Pb.z = %f",Pa.z - Pb.z);      
       
       //the detection is spurious if the point p_closest_cam2 lies outside the mate blob
       if(distClosestPointFromBlobCenter<((mateBlob.poses[5].position.x + mateBlob.poses[5].position.y)/2))
@@ -315,30 +323,20 @@ void Stereo_Detector::performStereoMatching()
 	geometry_msgs::PoseWithCovariance poseObjOpticalframe_,poseObjWorld_;
 	geometry_msgs::Pose poseOpticalframeWorld_;
 	
+  
+	poseOpticalframeWorld_.position.x = SelfOptFrameInWorldTransform.getOrigin().x();
+	poseOpticalframeWorld_.position.y = SelfOptFrameInWorldTransform.getOrigin().y();
+	poseOpticalframeWorld_.position.z = SelfOptFrameInWorldTransform.getOrigin().z();
+	
+	poseOpticalframeWorld_.orientation.w = SelfOptFrameInWorldTransform.getRotation().getW();
+	poseOpticalframeWorld_.orientation.x = SelfOptFrameInWorldTransform.getRotation().getX();
+	poseOpticalframeWorld_.orientation.y = SelfOptFrameInWorldTransform.getRotation().getY();
+	poseOpticalframeWorld_.orientation.z = SelfOptFrameInWorldTransform.getRotation().getZ();	  
+	  
+
 	try
 	{
-	  lr.lookupTransform("/world_link", selfCamRGBOpticalFrameLink, ros::Time(0), genericTransformation);
-	  
-	    poseOpticalframeWorld_.position.x = genericTransformation.getOrigin().x();
-	    poseOpticalframeWorld_.position.y = genericTransformation.getOrigin().y();
-	    poseOpticalframeWorld_.position.z = genericTransformation.getOrigin().z();
-	    
-	    poseOpticalframeWorld_.orientation.w = genericTransformation.getRotation().getW();
-	    poseOpticalframeWorld_.orientation.x = genericTransformation.getRotation().getX();
-	    poseOpticalframeWorld_.orientation.y = genericTransformation.getRotation().getY();
-	    poseOpticalframeWorld_.orientation.z = genericTransformation.getRotation().getZ();	  
-	  
-	}
-	
-	catch (tf::TransformException &ex) 
-	{
-	  ROS_WARN("%s",ex.what());
-	  ros::Duration(1.0).sleep();
-	  return;
-	}
-	
-	try
-	{
+	  //lr.waitForTransform(selfCamRGBOpticalFrameLink, detectedObjectLink, selfMessageTime, ros::Duration(3.0));
 	  lr.lookupTransform(selfCamRGBOpticalFrameLink, detectedObjectLink, ros::Time(0), genericTransformation);
 
 	  poseObjOpticalframe_.pose.position.x = genericTransformation.getOrigin().x();
@@ -349,7 +347,7 @@ void Stereo_Detector::performStereoMatching()
 	  poseObjOpticalframe_.pose.orientation.y = 0;
 	  poseObjOpticalframe_.pose.orientation.z = 0;
 	  
-	  double devFactor = 0.01*distClosestPointFromBlobCenter;
+	  double devFactor = 0.05*distClosestPointFromBlobCenter;
 	  double x_dev = devFactor*poseObjOpticalframe_.pose.position.x;
 	  double y_dev = devFactor*poseObjOpticalframe_.pose.position.y;
 	  double z_dev = devFactor*poseObjOpticalframe_.pose.position.z;
@@ -371,13 +369,14 @@ void Stereo_Detector::performStereoMatching()
 	catch (tf::TransformException &ex) 
 	{
 	  ROS_WARN("%s",ex.what());
-	  ros::Duration(1.0).sleep();
+	  
 	  return;
 	}	
 	
       
 	
 	objWorldPub_.publish(tgt_WFrame);
+
       }  
     }
     

@@ -114,6 +114,13 @@ class Stereo_Detector
     tf::TransformListener lr;
     tf::StampedTransform genericTransformation;
     
+    tf::StampedTransform SelfOptFrameInWorldTransform;
+    tf::StampedTransform mateOptFrameInWorldTransform;
+    
+    
+    
+    
+    
     bool stereoSuccess;
     
   

@@ -20,6 +20,26 @@ void Detector::storeLatestRobotPose(const geometry_msgs::PoseStamped::ConstPtr& 
   br.sendTransform(tf::StampedTransform(tfRobWorld, actualMessageTime, "world_link", robotBaseLink));
 }
 
+void Detector::storeLatestObjectGTPose(const geometry_msgs::PoseStamped::ConstPtr& msg)
+{
+  ros::Time actualMessageTime(msg->header.stamp.sec, msg->header.stamp.nsec);
+
+  tfRobWorld.setOrigin(tf::Vector3(msg->pose.position.x,msg->pose.position.y,msg->pose.position.z));
+  tf::Quaternion q(msg->pose.orientation.x,msg->pose.orientation.y,msg->pose.orientation.z,msg->pose.orientation.w);
+  tfRobWorld.setRotation(q);
+  
+  poseRobWorld_.position.x = msg->pose.position.x;
+  poseRobWorld_.position.y = msg->pose.position.y;
+  poseRobWorld_.position.z = msg->pose.position.z;
+  poseRobWorld_.orientation.w = msg->pose.orientation.w;
+  poseRobWorld_.orientation.x = msg->pose.orientation.x;
+  poseRobWorld_.orientation.y = msg->pose.orientation.y;
+  poseRobWorld_.orientation.z = msg->pose.orientation.z;
+  
+  br.sendTransform(tf::StampedTransform(tfRobWorld, actualMessageTime, "world_link", "GT_object_link"));
+}
+
+
 
 
 void Detector::storeCameraInfo(const sensor_msgs::CameraInfo::ConstPtr& msg)
