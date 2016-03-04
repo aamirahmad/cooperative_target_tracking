@@ -20,6 +20,26 @@ void Detector::storeLatestRobotPose(const geometry_msgs::PoseStamped::ConstPtr& 
   br.sendTransform(tf::StampedTransform(tfRobWorld, actualMessageTime, "world_link", robotBaseLink));
 }
 
+void Detector::storeLatestObjectGTPose(const geometry_msgs::PoseStamped::ConstPtr& msg)
+{
+  ros::Time actualMessageTime(msg->header.stamp.sec, msg->header.stamp.nsec);
+
+  tfRobWorld.setOrigin(tf::Vector3(msg->pose.position.x,msg->pose.position.y,msg->pose.position.z));
+  tf::Quaternion q(msg->pose.orientation.x,msg->pose.orientation.y,msg->pose.orientation.z,msg->pose.orientation.w);
+  tfRobWorld.setRotation(q);
+  
+  poseRobWorld_.position.x = msg->pose.position.x;
+  poseRobWorld_.position.y = msg->pose.position.y;
+  poseRobWorld_.position.z = msg->pose.position.z;
+  poseRobWorld_.orientation.w = msg->pose.orientation.w;
+  poseRobWorld_.orientation.x = msg->pose.orientation.x;
+  poseRobWorld_.orientation.y = msg->pose.orientation.y;
+  poseRobWorld_.orientation.z = msg->pose.orientation.z;
+  
+  br.sendTransform(tf::StampedTransform(tfRobWorld, actualMessageTime, "world_link", "GT_object_link"));
+}
+
+
 
 
 void Detector::storeCameraInfo(const sensor_msgs::CameraInfo::ConstPtr& msg)
@@ -62,6 +82,8 @@ void Detector::segmentationBasedDetection(const sensor_msgs::Image::ConstPtr& im
   //ROS_INFO("Received a mask Image");
   ros::Time actualMessageTime(image->header.stamp.sec, image->header.stamp.nsec);
 
+  br.sendTransform(tf::StampedTransform(tfCamRob, actualMessageTime, robotBaseLink, camBaseLink));   
+  
   cv_bridge::CvImagePtr cv_ptr;
   
   try
@@ -149,8 +171,7 @@ void Detector::segmentationBasedDetection(const sensor_msgs::Image::ConstPtr& im
 	tf::Quaternion q(0,0,0,1);
 	tfObCam.setRotation(q);
 	
-	br.sendTransform(tf::StampedTransform(tfObCam, actualMessageTime, camRGBOpticalFrameLink, detectedObjectLink));
-	br.sendTransform(tf::StampedTransform(tfCamRob, actualMessageTime, robotBaseLink, camBaseLink));      
+	br.sendTransform(tf::StampedTransform(tfObCam, actualMessageTime, camRGBOpticalFrameLink, detectedObjectLink));   
 	
 	//Now get the target in the world link frame
 	try
@@ -313,23 +334,169 @@ void Detector::segmentationBasedDetection(const sensor_msgs::Image::ConstPtr& im
   
 }
 
+void Detector::segmentationBasedDetectionUnknownSize(const sensor_msgs::Image::ConstPtr& image)
+{
+  //ROS_INFO("Received a mask Image");
+  ros::Time actualMessageTime(image->header.stamp.sec, image->header.stamp.nsec);
+
+  br.sendTransform(tf::StampedTransform(tfCamRob, actualMessageTime, robotBaseLink, camBaseLink));   
+  
+  cv_bridge::CvImagePtr cv_ptr;
+  
+  try
+  {
+      cv_ptr = cv_bridge::toCvCopy(image, "mono8");
+  }
+  catch (cv_bridge::Exception& e)
+  {
+      //if there is an error during conversion, display it
+      ROS_ERROR("Detector error when reading image on the segmentation mask image topic: %s", e.what());
+      return;
+  }    
+   
+  int i = 0, count = 0;
+  
+  vector<vector<Point> > contour_;
+  vector<Vec4i> hierarchy;
+  
+  findContours ( cv_ptr->image , contour_, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+
+  #ifdef DRAW_DEBUG  
+    Mat dst = Mat::zeros(cv_ptr->image.size(),CV_8UC3);
+  #endif
+      
+  int idx = 0, largestContourIndex = 0;
+  double areaOfLargestContour = 0; 
+  
+  // If we found at least one contour
+  if(contour_.size()>0)
+  {
+    // find the biggest contour
+    for( ; idx >= 0; idx = hierarchy[idx][0] )
+    {
+	const vector<Point>& c = contour_[idx];
+	double area = fabs(contourArea(Mat(c)));
+	if( area > areaOfLargestContour )
+	{
+	    areaOfLargestContour = area;
+	    largestContourIndex = idx;
+	}	
+    }
+  
+    if(areaOfLargestContour > minAreaOfTargetProject)
+    {
+      // find the convex hull
+      vector<vector<Point> >hull(1);
+      convexHull( Mat(contour_[largestContourIndex]), hull[0], false );
+      
+      /// Find the rotated rectangles and ellipses for each contour
+      vector<RotatedRect> minRect(1);
+      vector<RotatedRect> minEllipse(1);  
+      
+      minRect[0] = minAreaRect( Mat(contour_[largestContourIndex]) );
+	  if( contour_[largestContourIndex].size() > 5 )
+	    { minEllipse[i] = fitEllipse(Mat(contour_[largestContourIndex])); }
+	    
+      Point2f objectCenterIm = minRect[0].center;
+      double objectSizeInImage = minRect[0].size.width*minRect[0].size.height;
+      	
+      
+      // Check if the bounding rectangle is totally inside the image 
+      Point2f rectangle_points[4]; minRect[0].points(rectangle_points);
+      bool isRectFullyInsideImage = true;
+	for( int j = 0; j < 4; j++ )
+	{
+	  if(!(rectangle_points[j].x>2 &&  rectangle_points[j].y>2 &&  rectangle_points[j].x < (cv_ptr->image.cols - 2) &&  rectangle_points[j].y < (cv_ptr->image.rows - 2)))
+	   isRectFullyInsideImage = false;	
+	}
+      
+      if(isRectFullyInsideImage)
+      {
+	geometry_msgs::PoseArray blobInImage;
+	
+	blobInImage.header = image->header;
+	blobInImage.header.frame_id = camRGBOpticalFrameLink;
+	
+	geometry_msgs::Pose tempPose;
+	tempPose.position.x = objectCenterIm.x;
+	tempPose.position.y = objectCenterIm.y;
+	blobInImage.poses.push_back(tempPose);
+	
+	for( int j = 0; j < 4; j++ )
+	{
+	  tempPose.position.x = rectangle_points[j].x;
+	  tempPose.position.y = rectangle_points[j].y;	
+	  blobInImage.poses.push_back(tempPose);
+	}	
+
+	tempPose.position.x = minRect[0].size.width;
+	tempPose.position.y = minRect[0].size.height;	
+	blobInImage.poses.push_back(tempPose);	
+	
+	blobPublisher_.publish(blobInImage);
+
+      #ifdef TERMINAL_DEBUG
+      
+	ROS_INFO("objectCenterIm.x in pixels = %f",objectCenterIm.x);
+	ROS_INFO("objectCenterIm.y in pixels = %f",objectCenterIm.y);
+	
+	ROS_INFO("camFx in meter = %f",camFx);
+	ROS_INFO("objectRealSurfaceArea in meter square = %f",objectRealSurfaceArea);
+	ROS_INFO("objectSizeInImage in pixels = %f",objectSizeInImage);    
+	
+	ROS_INFO("X_obj_camfrm in meter = %f",X_obj_camfrm);
+	ROS_INFO("Y_obj_camfrm in meter = %f",Y_obj_camfrm);
+	ROS_INFO("Z_obj_camfrm in meter = %f",Z_obj_camfrm);  
+
+      #endif
+	
+	    
+      #ifdef DRAW_DEBUG
+	  Scalar color( rand()&255, rand()&255, rand()&255 );
+	  //drawContours( dst, contour_, largestContourIndex, color, 1, 8, hierarchy );
+	  
+	  Scalar color1( rand()&255, rand()&255, rand()&255 );
+	  //drawContours( dst, hull, i, color1, 1, 8, vector<Vec4i>(), 0, Point() );
+	  
+	  Scalar color2( rand()&255, rand()&255, rand()&255 );
+	  //ellipse( dst, minEllipse[i], color2, 2, 8 );
+	  // rotated rectangle
+	  Scalar color3( rand()&255, rand()&255, rand()&255 );
+	  Point2f rect_points[4]; minRect[0].points(rect_points);
+	  for( int j = 0; j < 4; j++ )
+	    line( dst, rect_points[j], rect_points[(j+1)%4], color3, 1, 8 );
+	  namedWindow( "Components", 1 );
+	  imshow( "Components", dst );
+	  waitKey(2);	
+      #endif	
+	
+      }
+      
+    }
+  }
+    
+  
+}
+
+
+
 int main(int argc, char* argv[])
 {
   
   ros::init(argc, argv, "tgt_detector");
 
-  if (argc < 2)
+  if (argc < 3)
     {
-      ROS_WARN("WARNING: you should at least specify the detector type as 'HISTOGRAM' or 'FEATURE' or 'COMBINED' of \n");
+      ROS_WARN("WARNING: you should specify i) the detector type as 'HISTOGRAM' or 'FEATURE' or 'COMBINED' and ii) whether or known the object size is known or not as 'KNOWN_SIZE' and 'UNKNOWN_SIZE' \n");
       return 1;
     }
   else
   {
-    ROS_INFO("Detector provided = %s",argv[1]);
+    ROS_INFO("Detector provided = %s for %s",argv[1],argv[2]);
   }
       
   ros::NodeHandle nh("~");  
-  Detector node(nh,argv[1]);
+  Detector node(nh,argv[1],argv[2]);
     
   spin();
   

@@ -14,6 +14,8 @@
 #include <std_msgs/Float32.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <geometry_msgs/PoseArray.h>
+#include <geometry_msgs/Pose.h>
 #include <sensor_msgs/image_encodings.h>
 
 #include <opencv2/imgproc/imgproc.hpp>
@@ -71,11 +73,12 @@ class Detector
     string detectedObjectLink;
     string robotBaseLink;
     string detectedObject_Wframe_Topic;
+    string targetBlobTopic;
     
     NodeHandle nh_;
     image_transport::ImageTransport it_;
     image_transport::Subscriber imageSub_;
-    Subscriber camInfoSub_,robotPoseSub_;
+    Subscriber camInfoSub_,robotPoseSub_,objectGTPoseSub_;
     Publisher objWorldPub_;
     ///@hack for February demo. @Fix this
     Publisher projectedObjWorldPub_; // Publishes pose of the object projected onto the ground plane in the direction of the camera. 
@@ -117,12 +120,15 @@ class Detector
     geometry_msgs::Pose poseOpticalframeWorld_;
     geometry_msgs::PoseWithCovariance poseObjOpticalframe_;    
     
+    ///@hack for the IROS paper. @Fix it
+    Publisher blobPublisher_;
+    
     ///@hack for February demo. @Fix this
     tf::Transform tfProjectedObWorld;
     geometry_msgs::PoseWithCovarianceStamped projectedPoseObjWorld;
   
   public:
-    Detector(NodeHandle &_nh, char *detectorType): nh_(_nh), it_(nh_)
+    Detector(NodeHandle &_nh, char *detectorType, char *sizeKnownOrNot): nh_(_nh), it_(nh_)
     {
       nh_.getParam("base_image_topic", baseImageTopic);
       nh_.getParam("mask_image_topic", maskImageTopic);
@@ -138,14 +144,22 @@ class Detector
       nh_.getParam("robotPoseTopic", robotPoseTopic);     
       nh_.getParam("projectedObjectLink", projectedObjectLink);     
       nh_.getParam("detectedObject_Wframe_Topic", detectedObject_Wframe_Topic); 
+      nh_.getParam("targetBlobTopic", targetBlobTopic); 
       
       ROS_INFO("detector type = %s",detectorType);
 
 	if(strcmp(detectorType,"HISTOGRAM")==0){
+	  if(strcmp(sizeKnownOrNot,"KNOWN_SIZE")==0){
 	        imageSub_ = it_.subscribe(maskImageTopic, 10, boost::bind(&Detector::segmentationBasedDetection,this, _1));
-		ROS_INFO("Detection using purely a color histogram-based segmentation method with image topic = %s",maskImageTopic.c_str());	
-		meanFactor = pow((1+pow(3,0.5))/2,0.5);
-		devFactor = pow(pow(3,0.5)-1,0.5)/2.0;		
+		ROS_INFO("Detection using purely a color histogram-based segmentation method with known size and with image topic = %s",maskImageTopic.c_str());
+	  }
+	  else
+	    if(strcmp(sizeKnownOrNot,"UNKNOWN_SIZE")==0){
+	        imageSub_ = it_.subscribe(maskImageTopic, 10, boost::bind(&Detector::segmentationBasedDetectionUnknownSize,this, _1));
+		ROS_INFO("Detection using purely a color histogram-based segmentation method with UNKNOWN size and with image topic = %s",maskImageTopic.c_str());	      
+	    }
+	  meanFactor = pow((1+pow(3,0.5))/2,0.5);
+	  devFactor = pow(pow(3,0.5)-1,0.5)/2.0;
 	}
 
 	if(strcmp(detectorType,"FEATURE")==0){
@@ -162,12 +176,21 @@ class Detector
       camInfoSub_ = nh_.subscribe<sensor_msgs::CameraInfo>(camInfoTopic, 10,boost::bind(&Detector::storeCameraInfo,this,_1));
       
        // Other subscribers
-      robotPoseSub_ = nh_.subscribe<geometry_msgs::PoseStamped>(robotPoseTopic, 10,boost::bind(&Detector::storeLatestRobotPose,this,_1));      
+      robotPoseSub_ = nh_.subscribe<geometry_msgs::PoseStamped>(robotPoseTopic, 10,boost::bind(&Detector::storeLatestRobotPose,this,_1));
+
+      if(strcmp(robotPoseTopic.c_str(),"/TeleKyb/Vicon/UAV_Octo_43/UAV_Octo_43")==0)
+      {
+	ROS_INFO("robotino subscribed");
+	
+	objectGTPoseSub_ = nh_.subscribe<geometry_msgs::PoseStamped>("/TeleKyb/Vicon/UAV_Robotino/UAV_Robotino", 10,boost::bind(&Detector::storeLatestObjectGTPose,this,_1));      
+      }
       
       // Publishers
       objWorldPub_ = nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>("/fixPoint_actual", 1000);
       ///@hack for February demo. @Fix this
       projectedObjWorldPub_ = nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>(detectedObject_Wframe_Topic, 1000);
+      
+      blobPublisher_ = nh_.advertise<geometry_msgs::PoseArray>(targetBlobTopic, 1000);
       
        //Setting up fixed transformations if any
       tfCamRob.setOrigin( tf::Vector3(0.0975,0.0,-0.04603));
@@ -177,11 +200,18 @@ class Detector
 
     }
     
-    /*! \brief This is a method for detection that outputs the centroid of the largest
+    /*! \brief This is a method for detection that outputs the 3D detected position of the target based on
+     * the detection of the centroid of the largest
      * image blob in the segmented image. Segmented image is obtained using the
      * pal_image_segmentation package.
      */
     void segmentationBasedDetection(const sensor_msgs::Image::ConstPtr&);    
+    
+    /*! \brief This is a method for detection that outputs only the image centroid of the largest
+     * image blob in the segmented image. Segmented image is obtained using the
+     * pal_image_segmentation package.
+     */
+    void segmentationBasedDetectionUnknownSize(const sensor_msgs::Image::ConstPtr&);     
     
     /*! \brief This is a method for detection that outputs the centroid of the object'S
      * projection in the actual image using a feature-based detection method
@@ -202,6 +232,7 @@ class Detector
     * of the class
     */
     void storeLatestRobotPose(const geometry_msgs::PoseStamped::ConstPtr&);    
-      
+    
+    void storeLatestObjectGTPose(const geometry_msgs::PoseStamped::ConstPtr&); 
     
 };

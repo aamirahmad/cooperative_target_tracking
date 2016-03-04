@@ -7,7 +7,7 @@ void Fusor::fuseMeasurements()
   // Check if measurements are not far apart, if so choose the latest;
   ros::Duration timediff = selfMessageTime - mateMessageTime;
   
-  double thresholdTimeInSec = 0.03,timediffInSec = timediff.toSec();
+  double thresholdTimeInSec = 0.2,timediffInSec = timediff.toSec();
 
   if(timediffInSec > thresholdTimeInSec)
   {
