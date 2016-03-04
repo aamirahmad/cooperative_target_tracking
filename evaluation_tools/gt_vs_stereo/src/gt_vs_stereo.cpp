@@ -23,6 +23,10 @@ void GT_stereo_evaluator::gt_callback(const geometry_msgs::PoseWithCovarianceSta
 
 void GT_stereo_evaluator::detected_43_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg){
   
+  gtPose.pose.pose.position.x = 0;
+  gtPose.pose.pose.position.y = 0;
+  gtPose.pose.pose.position.z = 0;
+  
   detectedPose_43.header = msg->header;
   detectedPose_43.pose = msg->pose;  
   
@@ -40,6 +44,10 @@ void GT_stereo_evaluator::detected_43_callback(const geometry_msgs::PoseWithCova
 
 
 void GT_stereo_evaluator::detected_44_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg){   
+  
+  gtPose.pose.pose.position.x = 0;
+  gtPose.pose.pose.position.y = 0;
+  gtPose.pose.pose.position.z = 0;
   
   detectedPose_44.header = msg->header;
   detectedPose_44.pose = msg->pose;  
@@ -65,10 +73,23 @@ void GT_stereo_evaluator::detected_44_callback(const geometry_msgs::PoseWithCova
   
   detectionError_44.push_back(error);
   
+  currentGTtime = msg->header.stamp;
+  
+  if(bagInitialized==false)
+  {
+    firstGTtime = msg->header.stamp;
+  }
+  
+  bagInitialized = true;  
+  
 }
 
 
 void GT_stereo_evaluator::detected_43_naive_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg){
+  
+  gtPose.pose.pose.position.x = 0;
+  gtPose.pose.pose.position.y = 0;
+  gtPose.pose.pose.position.z = 0;
   
   detectedNaivePose_43.header = msg->header;
   detectedNaivePose_43.pose = msg->pose;  
@@ -88,6 +109,10 @@ void GT_stereo_evaluator::detected_43_naive_callback(const geometry_msgs::PoseWi
 
 void GT_stereo_evaluator::detected_44_naive_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg){
   
+  gtPose.pose.pose.position.x = 0;
+  gtPose.pose.pose.position.y = 0;
+  gtPose.pose.pose.position.z = 0;
+  
   detectedNaivePose_44.header = msg->header;
   detectedNaivePose_44.pose = msg->pose;  
   
@@ -105,6 +130,10 @@ void GT_stereo_evaluator::detected_44_naive_callback(const geometry_msgs::PoseWi
 
 
 void GT_stereo_evaluator::fused_43_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg){
+  
+  gtPose.pose.pose.position.x = 0;
+  gtPose.pose.pose.position.y = 0;
+  gtPose.pose.pose.position.z = 0;
   
   fusedPose_43.header = msg->header;
   fusedPose_43.pose = msg->pose;  
@@ -147,6 +176,10 @@ void GT_stereo_evaluator::fused_43_callback(const geometry_msgs::PoseWithCovaria
 
 void GT_stereo_evaluator::fused_44_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg){
   
+  gtPose.pose.pose.position.x = 0;
+  gtPose.pose.pose.position.y = 0;
+  gtPose.pose.pose.position.z = 0;
+  
   fusedPose_44.header = msg->header;
   fusedPose_44.pose = msg->pose;  
   
@@ -185,6 +218,10 @@ void GT_stereo_evaluator::fused_44_callback(const geometry_msgs::PoseWithCovaria
 
 void GT_stereo_evaluator::tracked_43_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg){
   
+  gtPose.pose.pose.position.x = 0;
+  gtPose.pose.pose.position.y = 0;
+  gtPose.pose.pose.position.z = 0;  
+  
   trackedPose_43.header = msg->header;
   trackedPose_43.pose = msg->pose;  
   
@@ -202,6 +239,10 @@ void GT_stereo_evaluator::tracked_43_callback(const geometry_msgs::PoseWithCovar
 
 void GT_stereo_evaluator::tracked_44_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg){
  
+  gtPose.pose.pose.position.x = 0;
+  gtPose.pose.pose.position.y = 0;
+  gtPose.pose.pose.position.z = 0;
+  
   trackedPose_44.header = msg->header;
   trackedPose_44.pose = msg->pose;  
   
@@ -278,9 +319,9 @@ int main(int argc, char* argv[])
     spinOnce();
     
     ros::Duration timediff = node.currentGTtime - node.firstGTtime;
-    //ROS_INFO("timediff in seconds = %f",timediff.toSec());
+    ROS_INFO("timediff in seconds = %f",timediff.toSec());
     
-    if(fabs(timediff.toSec()) > 580.0)
+    if(fabs(timediff.toSec()) > 420.0)
     {
       node.finalEvaluation();
       ros::shutdown();

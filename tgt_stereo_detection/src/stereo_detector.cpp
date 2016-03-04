@@ -68,7 +68,7 @@ void Stereo_Detector::performStereoMatching()
   // Check if measurements are not far apart, if so choose the latest;
   ros::Duration timediff = selfMessageTime - mateMessageTime;
   
-  double thresholdTimeInSec = 0.03,timediffInSec = timediff.toSec();
+  double thresholdTimeInSec = 0.2,timediffInSec = timediff.toSec();
 
   if(timediffInSec > thresholdTimeInSec)
   {
@@ -85,7 +85,7 @@ void Stereo_Detector::performStereoMatching()
   if(timediffInSec > -thresholdTimeInSec && timediffInSec < thresholdTimeInSec)
   {
 
-    ROS_INFO("performStereoMatching");
+    //ROS_INFO("performStereoMatching");
     //perform stereo matching because we have some coherence in time
     
     
