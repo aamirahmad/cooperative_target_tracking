@@ -117,8 +117,31 @@ void GT_stereo_evaluator::fused_43_callback(const geometry_msgs::PoseWithCovaria
   zEr = fusedPose_43.pose.pose.position.z - gtPose.pose.pose.position.z;
   
   error = pow((xEr*xEr+yEr*yEr+zEr*zEr),0.5);
-  fusedError_43.push_back(error);  
   
+  
+  if(error>2)
+  {
+    cout << "error = " <<error<< endl;
+    return;
+  }  
+  
+  
+  if(error!=error){
+    //cout << "error = " <<error<< endl;
+    //cout << "gtPose.pose.pose.position.x = " <<gtPose.pose.pose.position.x<< endl;
+    //cout << "gtPose.pose.pose.position.y = " <<gtPose.pose.pose.position.y<< endl;
+    //cout << "gtPose.pose.pose.position.z = " <<gtPose.pose.pose.position.z<< endl;
+    
+    //cout << "fusedPose_43.pose.pose.position.x = " <<fusedPose_43.pose.pose.position.x<< endl;
+    //cout << "fusedPose_43.pose.pose.position.y = " <<fusedPose_43.pose.pose.position.y<< endl;
+    //cout << "fusedPose_43.pose.pose.position.z = " <<fusedPose_43.pose.pose.position.z<< endl;    
+    
+  }
+  else
+  {  
+    fusedError_43.push_back(error);  
+    fprintf(resultsFile43,"%d\t%f\t%f\t%f\t%f\t%f\t%f\n",fusedPose_43.header.seq,fusedPose_43.pose.pose.position.x,fusedPose_43.pose.pose.position.y, fusedPose_43.pose.pose.position.z, gtPose.pose.pose.position.x, gtPose.pose.pose.position.y, gtPose.pose.pose.position.z);
+  }
 }
 
 
@@ -133,10 +156,30 @@ void GT_stereo_evaluator::fused_44_callback(const geometry_msgs::PoseWithCovaria
   xEr = fusedPose_44.pose.pose.position.x - gtPose.pose.pose.position.x;
   yEr = fusedPose_44.pose.pose.position.y - gtPose.pose.pose.position.y;
   zEr = fusedPose_44.pose.pose.position.z - gtPose.pose.pose.position.z;
-  
+    
   error = pow((xEr*xEr+yEr*yEr+zEr*zEr),0.5);
-  fusedError_44.push_back(error);  
   
+  if(error>2)
+  {
+    cout << "error = " <<error<< endl;
+    return;
+  }
+  
+  if(error!=error){
+    //cout << "error = " <<error<< endl;
+    //cout << "gtPose.pose.pose.position.x = " <<gtPose.pose.pose.position.x<< endl;
+    //cout << "gtPose.pose.pose.position.y = " <<gtPose.pose.pose.position.y<< endl;
+    //cout << "gtPose.pose.pose.position.z = " <<gtPose.pose.pose.position.z<< endl;
+    
+    //cout << "fusedPose_44.pose.pose.position.x = " <<fusedPose_44.pose.pose.position.x<< endl;
+    //cout << "fusedPose_44.pose.pose.position.y = " <<fusedPose_44.pose.pose.position.y<< endl;
+    //cout << "fusedPose_44.pose.pose.position.z = " <<fusedPose_44.pose.pose.position.z<< endl;
+  }
+  else
+  {
+    fusedError_44.push_back(error);  
+    fprintf(resultsFile44,"%d\t%f\t%f\t%f\t%f\t%f\t%f\n",fusedPose_44.header.seq, fusedPose_44.pose.pose.position.x,fusedPose_44.pose.pose.position.y, fusedPose_44.pose.pose.position.z, gtPose.pose.pose.position.x, gtPose.pose.pose.position.y, gtPose.pose.pose.position.z);
+  }
 }  
 
 
@@ -178,24 +221,26 @@ void GT_stereo_evaluator::finalEvaluation(){
   
   ROS_INFO("Reached the end of dataset. Starting final evaluation now");
   
-  double sum = std::accumulate(detectionError_44.begin(), detectionError_44.end(), 0.0);
-  double mean = sum / detectionError_44.size();
+  double sum = std::accumulate(fusedError_43.begin(), fusedError_43.end(), 0.0);
+  double mean = sum / fusedError_43.size();
 
-  double sq_sum = std::inner_product(detectionError_44.begin(), detectionError_44.end(), detectionError_44.begin(), 0.0);
-  double stdev = std::sqrt(sq_sum / detectionError_44.size() - mean * mean);
+  double sq_sum = std::inner_product(fusedError_43.begin(), fusedError_43.end(), fusedError_43.begin(), 0.0);
+  double stdev = std::sqrt(sq_sum / fusedError_43.size() - mean * mean);
   
-  cout << mean << endl;
-  cout << stdev << endl;  
+  cout << "fusedError_43 MEAN = "<< mean << endl;
+  cout << "fusedError_43 STDV = "<< stdev << endl;  
   
   
-  sum = std::accumulate(trackedError_43.begin(), trackedError_43.end(), 0.0);
-  mean = sum / trackedError_43.size();
+  sum = std::accumulate(fusedError_44.begin(), fusedError_44.end(), 0.0);
+  mean = sum / fusedError_44.size();
 
-  sq_sum = std::inner_product(trackedError_43.begin(), trackedError_43.end(), trackedError_43.begin(), 0.0);
-  stdev = std::sqrt(sq_sum / trackedError_43.size() - mean * mean);
+  sq_sum = std::inner_product(fusedError_44.begin(), fusedError_44.end(), fusedError_44.begin(), 0.0);
+  stdev = std::sqrt(sq_sum / fusedError_44.size() - mean * mean);
   
-  cout << mean << endl;
-  cout << stdev << endl;    
+  cout << "fusedError_44 MEAN = "<<  mean << endl;
+  cout << "fusedError_44 STDV = "<< stdev << endl;   
+  
+  fcloseall();
   
 }
 
@@ -235,7 +280,7 @@ int main(int argc, char* argv[])
     ros::Duration timediff = node.currentGTtime - node.firstGTtime;
     //ROS_INFO("timediff in seconds = %f",timediff.toSec());
     
-    if(fabs(timediff.toSec()) > 360.0)
+    if(fabs(timediff.toSec()) > 580.0)
     {
       node.finalEvaluation();
       ros::shutdown();

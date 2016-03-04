@@ -71,7 +71,9 @@ class GT_stereo_evaluator
 	     tracked_43,tracked_44,
 	     gtSub_;
 	     
-  NodeHandle nh_;	     
+  NodeHandle nh_;
+  
+  FILE *resultsFile43,*resultsFile44;
   
   
   public:
@@ -93,6 +95,9 @@ class GT_stereo_evaluator
       tracked_44 = nh_.subscribe<geometry_msgs::PoseWithCovarianceStamped>("/trackedObjectState_byRobot_44", 10,boost::bind(&GT_stereo_evaluator::tracked_44_callback,this,_1));     
       
       bagInitialized=false;
+      
+      resultsFile43 = fopen("results_43.dat","w");
+      resultsFile44 = fopen("results_44.dat","w");
 
     }
     
